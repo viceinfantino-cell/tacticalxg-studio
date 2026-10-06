@@ -206,6 +206,11 @@ input.colorpick::-moz-color-swatch{border:none;border-radius:50%;}
 .backup-status{font-size:12px; font-weight:600; margin-top:10px; color:var(--text-soft); min-height:16px;}
 .backup-status.ok{color:#16a34a;}
 .backup-status.err{color:var(--red);}
+.backup-last{font-size:12px;color:var(--text-soft);margin-top:8px;}
+.backup-reminder{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;margin-bottom:12px;border-radius:12px;
+  background:color-mix(in srgb, #f59e0b 16%, var(--card));border:1px solid color-mix(in srgb, #f59e0b 55%, transparent);font-size:12.5px;font-weight:600;}
+.backup-reminder.show{display:flex;}
+.backup-reminder span{flex:1 1 200px;}
 .cloud-badge{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; padding:4px 10px 4px 8px; border-radius:20px; border:1.5px solid var(--border); background:var(--bg); white-space:nowrap;}
 .cloud-badge .dot{width:8px; height:8px; border-radius:50%; background:#9ca3af; flex:none;}
 .cloud-badge.cb-ok .dot{background:#16a34a;}
@@ -874,9 +879,10 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
         <div class="backup-actions">
           <button class="mini-btn icon-btn-fill-btn" style="width:auto" onclick="exportFullBackup()">⬇️ Esporta backup completo</button>
           <button class="mini-btn" style="width:auto" onclick="document.getElementById('backupImportInput').click()">⬆️ Importa backup</button>
-          <button class="mini-btn" style="width:auto" onclick="manualRestoreFromCloud()">☁️ Ripristina dal cloud</button>
+          <button class="mini-btn" id="cloudRestoreBtn" style="width:auto" onclick="manualRestoreFromCloud()">☁️ Ripristina dal cloud</button>
           <input type="file" id="backupImportInput" accept="application/json,.json" style="display:none" onchange="handleBackupFileSelected(this)">
         </div>
+        <div class="backup-last" id="backupLastLine"></div>
         <div class="backup-status" id="backupStatus"></div>
       </div>
     </div>
@@ -932,6 +938,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
 
 <!-- ================= TAB LIVE ================= -->
 <div class="tabpanel active" id="tab-live">
+  <div class="backup-reminder" id="backupReminderLive"><span id="backupReminderText"></span><button type="button" class="mini-btn" style="width:auto" onclick="exportFullBackup()">💾 Fai il backup</button></div>
   <div class="card" id="liveManualCard">
     <h2><span>Conteggio eventi</span><span class="counter-head" id="counterHead"><span></span><span id="chTeamN"></span><span id="chTeamA"></span></span></h2>
     <div class="counter-grid" id="counterList"></div>
@@ -1716,6 +1723,12 @@ function updateCloudBadge(){
   if(!el || !txt) return;
   el.classList.remove('cb-ok','cb-err','cb-wait');
   if(!cloudReady){
+    if(cloudLastError === 'API non presente'){
+      // App installata fuori da Claude: il cloud di Claude non c'è, i dati restano sul dispositivo.
+      el.classList.add('cb-wait');
+      txt.textContent = 'Dati salvati su questo dispositivo · fai ogni tanto un backup';
+      return;
+    }
     el.classList.add('cb-err');
     txt.textContent = cloudLastError ? ('Cloud: non disponibile ('+cloudLastError+')') : 'Cloud: non disponibile in questa visualizzazione';
     return;
@@ -1955,6 +1968,40 @@ function buildFullBackupObject(){
     matches: matches
   };
 }
+/* ---- Promemoria backup + protezione dati sul dispositivo (app installata) ---- */
+const BACKUP_REMIND_DAYS = 7;
+function updateBackupReminder(){
+  let last = 0, dirty = false;
+  try{ last = parseInt(localStorage.getItem('txg_last_backup')||'0',10) || 0; dirty = localStorage.getItem('txg_dirty')==='1'; }catch(e){}
+  const hasData = (typeof matchesIndex!=='undefined' && matchesIndex.length>0) || (typeof projectsIndex!=='undefined' && projectsIndex.length>0);
+  const days = last ? Math.floor((Date.now()-last)/86400000) : null;
+  const lastEl = document.getElementById('backupLastLine');
+  if(lastEl){
+    lastEl.textContent = last
+      ? 'Ultimo backup: '+new Date(last).toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})+' ('+(days===0?'oggi':days+' giorni fa')+')'
+      : 'Nessun backup ancora eseguito su questo dispositivo.';
+  }
+  const bar = document.getElementById('backupReminderLive');
+  const txt = document.getElementById('backupReminderText');
+  if(!bar || !txt) return;
+  let msg = '';
+  if(hasData && !last) msg = 'Non hai ancora fatto nessun backup: i dati sono solo su questo dispositivo.';
+  else if(hasData && dirty && days >= BACKUP_REMIND_DAYS) msg = 'Ultimo backup '+days+' giorni fa e da allora hai aggiunto dati: conviene rifarlo.';
+  txt.textContent = msg;
+  bar.classList.toggle('show', !!msg);
+}
+(function initPwaSafety(){
+  try{
+    if(navigator.storage && navigator.storage.persist){ navigator.storage.persist().catch(function(){}); }
+  }catch(e){}
+  window.addEventListener('load', function(){
+    if(typeof claude === 'undefined' || !claude.use){
+      const b = document.getElementById('cloudRestoreBtn'); if(b) b.style.display = 'none';
+    }
+    setTimeout(updateBackupReminder, 600);
+    setInterval(updateBackupReminder, 60000);
+  });
+})();
 async function exportFullBackup(){
   try{
     setBackupStatus('Preparazione del backup...', '');
@@ -1962,8 +2009,11 @@ async function exportFullBackup(){
     const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], {type:'application/json'});
     const dateStr = new Date().toISOString().slice(0,10);
-    await saveFileViaDownloads('tacticalxg_backup_'+dateStr+'.json', blob);
-    setBackupStatus('Backup esportato correttamente. Conservalo in un posto sicuro (es. Files/iCloud).', 'ok');
+    const saved = await saveFileViaDownloads('tacticalxg_backup_'+dateStr+'.json', blob);
+    if(saved === false){ setBackupStatus('Backup annullato: non è stato salvato.', ''); return; }
+    try{ localStorage.setItem('txg_last_backup', String(Date.now())); localStorage.removeItem('txg_dirty'); }catch(e){}
+    updateBackupReminder();
+    setBackupStatus('Backup esportato. Salvalo in File → iCloud Drive per tenerlo al sicuro.', 'ok');
   }catch(e){
     console.error('Full backup export failed', e);
     setBackupStatus('Esportazione del backup non riuscita.', 'err');
@@ -2217,6 +2267,7 @@ function saveState(){
   if(!currentMatchId) return;
   try{
     localStorage.setItem(matchKey(currentMatchId), JSON.stringify(state));
+    localStorage.setItem('txg_dirty','1');
     const idx = matchesIndex.find(m=>m.id===currentMatchId);
     if(idx){ idx.teamN = state.teamN; idx.teamA = state.teamA; saveMatchesIndex(); }
   }catch(e){}
@@ -4242,21 +4293,22 @@ async function saveFileViaDownloads(filename, data){
     // Dentro Claude: salvataggio tramite l'API "downloads". Fuori (app installata/PWA): download del browser.
     if(typeof claude !== 'undefined' && claude.use){
       const downloads = await claude.use('downloads');
-      if(downloads){ await downloads.save({filename, data}); return; }
+      if(downloads){ await downloads.save({filename, data}); return true; }
     }
     const blob = (data instanceof Blob) ? data : new Blob([data]);
     if(navigator.canShare && typeof File !== 'undefined'){
       try{
         const f = new File([blob], filename, {type: blob.type || 'application/octet-stream'});
-        if(navigator.canShare({files:[f]})){ await navigator.share({files:[f], title: filename}); return; }
-      }catch(e){ if(e && e.name === 'AbortError') return; }
+        if(navigator.canShare({files:[f]})){ await navigator.share({files:[f], title: filename}); return true; }
+      }catch(e){ if(e && e.name === 'AbortError') return false; }
     }
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = filename; document.body.appendChild(a); a.click();
     setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 1500);
+    return true;
   }catch(err){
-    if(err && err.code === 'declined') return;
+    if(err && err.code === 'declined') return false;
     console.error('Export failed', err);
     showAlert('Esportazione non riuscita. Riprova.');
   }

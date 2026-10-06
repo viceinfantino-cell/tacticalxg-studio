@@ -1,6 +1,6 @@
 /* Service worker TacticalXG Studio: uso offline.
    Per aggiornare l'app dopo aver cambiato index.html, aumenta il numero di VERSION. */
-const VERSION = 'txg-v2';
+const VERSION = 'txg-v4';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 const LIBS = [
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
