@@ -1,0 +1,28 @@
+TacticalXG Studio - pacchetto app (PWA)
+
+CONTENUTO
+  index.html            l'app
+  manifest.webmanifest  nome, icone e colori dell'app
+  sw.js                 uso offline
+  icons/                icone (logo "IV")
+
+PUBBLICARE (gratis) - opzione piu' semplice: Netlify Drop
+  1. Vai su https://app.netlify.com/drop (serve un account gratuito).
+  2. Trascina nella pagina la CARTELLA "TacticalXG_PWA" (non lo zip).
+  3. Ricevi un indirizzo https://....netlify.app: e' la tua app.
+  Alternativa: GitHub Pages o Cloudflare Pages (carichi gli stessi file).
+
+INSTALLARE
+  iPhone/iPad: apri l'indirizzo in Safari > Condividi > "Aggiungi a Home".
+  Mac (Safari): File > "Aggiungi al Dock".
+  Mac/PC (Chrome): menu > "Installa TacticalXG Studio".
+  Apri l'app una volta con internet: dopo funziona anche offline.
+
+AGGIORNARE
+  Quando ti mandero' una nuova versione, sostituisci index.html (e sw.js: il numero
+  VERSION va aumentato, es. txg-v2) e ripubblica la cartella.
+
+DATI
+  I dati restano nel dispositivo, separati da quelli dell'app dentro Claude: i progetti
+  salvati lì non compaiono qui. Per trasferirli usa nell'app il backup (Esporta backup / Importa backup)
+  nella schermata dei progetti.
