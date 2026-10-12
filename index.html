@@ -314,6 +314,76 @@ nav.tabs button.active{background:var(--brand);color:#ffffff;border-color:var(--
 .counter-head{display:grid;grid-template-columns:1fr 108px 108px;gap:10px;font-size:11.5px;color:var(--text-soft);
   text-transform:uppercase;letter-spacing:.04em;padding:0 4px 6px;font-weight:800;}
 .counter-head span{text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* video partita con barra in sovraimpressione */
+.video-card{padding:12px;margin-bottom:10px;}
+.vc-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.vc-head h2{margin:0;flex:1 1 auto;}
+.vc-empty{font-size:13px;color:var(--text-soft);line-height:1.5;}
+.vc-stage{position:relative;background:#000;border-radius:12px;overflow:hidden;}
+.vc-stage video{width:100%;display:block;max-height:58vh;background:#000;}
+.vc-fs{position:absolute;right:10px;top:10px;z-index:5;background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.25);
+  border-radius:8px;padding:5px 9px;font-size:14px;cursor:pointer;}
+.vbug{position:absolute;left:12px;top:12px;z-index:4;display:flex;align-items:stretch;pointer-events:none;
+  background:rgba(8,10,15,.88);color:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.45);font-size:15px;}
+.vb-team{display:flex;align-items:center;gap:7px;padding:5px 9px;}
+.vb-team.n{border-left:5px solid var(--sg-cn,#2563eb);} .vb-team.a{border-right:5px solid var(--sg-ca,#ea580c);}
+.vb-logo{width:26px;height:26px;object-fit:contain;} .vb-badge{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;}
+.vb-name{font-weight:800;letter-spacing:.05em;text-transform:uppercase;font-size:12.5px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vb-score{font-weight:900;font-size:20px;min-width:26px;text-align:center;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.12);border-radius:5px;padding:0 6px;}
+.vb-clock{display:flex;align-items:baseline;gap:5px;padding:5px 12px;background:#161a24;font-weight:900;font-variant-numeric:tabular-nums;font-size:20px;
+  border-left:1px solid #2a3040;border-right:1px solid #2a3040;}
+.vb-clock small{font-size:12px;color:#fbbf24;font-weight:800;}
+.vc-sync{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center;}
+.vc-sync .mini-btn{width:auto;}
+.vc-sync .vc-primary{background:var(--blue);color:#fff;border-color:transparent;font-weight:800;}
+.vc-sync select{padding:7px 8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:700;}
+.vc-status{font-size:12px;color:var(--text-soft);margin-top:8px;line-height:1.6;flex-basis:100%;}
+.vc-status b{color:var(--text);}
+@media (min-width:1000px){
+  #tab-live.active.has-video{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0 14px;align-items:start;}
+  #tab-live.active.has-video > .video-card{grid-column:1;grid-row:1 / span 14;position:sticky;top:calc(var(--hdr-h,170px) + 8px);}
+  #tab-live.active.has-video > :not(.video-card){grid-column:2;}
+}
+.has-video > #scorebugCard{display:none;}
+/* tastierino "Vai al minuto" */
+.gm-display{font-size:40px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.04em;
+  background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:8px 10px;margin:4px 0 10px;min-height:62px;}
+.gm-display small{display:block;font-size:11.5px;font-weight:700;color:var(--text-soft);letter-spacing:0;margin-top:2px;}
+.gm-seg{display:flex;gap:8px;margin-bottom:10px;}
+.gm-seg button{flex:1;padding:11px 8px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:800;font-size:14px;cursor:pointer;}
+.gm-seg button.on{background:var(--blue);border-color:transparent;color:#fff;}
+.gm-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.gm-pad button{height:58px;font-size:24px;font-weight:800;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;touch-action:manipulation;}
+.gm-pad button:active{background:var(--border);}
+.gm-pad button.fn{font-size:18px;color:var(--text-soft);}
+.gm-go{display:flex;gap:8px;margin-top:12px;}
+.gm-go button{flex:1;padding:14px 8px;border-radius:12px;border:none;font-weight:800;font-size:15px;cursor:pointer;}
+.gm-go .run{background:var(--blue);color:#fff;} .gm-go .hold{background:var(--border);color:var(--text);}
+.gm-cancel{display:block;width:100%;margin-top:8px;background:none;border:none;color:var(--text-soft);font-weight:700;font-size:14px;padding:8px;cursor:pointer;}
+/* cronometro di partita in stile broadcast (loghi, risultato, tempo) */
+.scorebug-card{padding:10px 12px;margin-bottom:10px;}
+.scorebug{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;background:#0b0d12;color:#fff;
+  border-radius:12px;overflow:hidden;border:1px solid #232733;box-shadow:0 8px 22px -12px rgba(0,0,0,.6);}
+.sg-team{display:flex;align-items:center;gap:10px;padding:8px 12px;min-width:0;}
+.sg-team.n{border-left:6px solid var(--sg-cn,#2563eb);justify-content:flex-start;}
+.sg-team.a{border-right:6px solid var(--sg-ca,#ea580c);justify-content:flex-end;}
+.sg-logo{width:42px;height:42px;object-fit:contain;flex:0 0 auto;}
+.sg-badge{width:42px;height:42px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;}
+.sg-name{font-weight:800;letter-spacing:.05em;text-transform:uppercase;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.sg-score{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.1);border-radius:8px;min-width:42px;text-align:center;padding:0 8px;line-height:1.25;}
+.sg-clock{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 18px;min-width:120px;
+  background:linear-gradient(#1a1f2b,#10131b);border-left:1px solid #2a3040;border-right:1px solid #2a3040;}
+.sg-time{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.1;display:flex;align-items:baseline;gap:6px;}
+.sg-extra{font-size:15px;color:#fbbf24;}
+.sg-phase{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#9aa1ad;margin-top:2px;}
+.sg-phase.live{color:#34d399;} .sg-phase.paused{color:#fbbf24;}
+.sg-controls{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;}
+.sg-controls .mini-btn{width:auto;}
+.sg-controls .sg-primary{background:var(--blue);color:#fff;border-color:transparent;font-weight:800;}
+@media (max-width:560px){
+  .sg-name{display:none;} .sg-logo,.sg-badge{width:34px;height:34px;} .sg-score{font-size:24px;min-width:34px;}
+  .sg-clock{padding:6px 10px;min-width:98px;} .sg-time{font-size:23px;} .sg-team{padding:8px;gap:6px;}
+}
 /* contatori manuali compatti sopra il campetto */
 #liveManualCard{padding:10px 12px;margin-bottom:10px;}
 #liveManualCard h2{margin:0 0 6px;font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;}
@@ -939,6 +1009,43 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
 <!-- ================= TAB LIVE ================= -->
 <div class="tabpanel active" id="tab-live">
   <div class="backup-reminder" id="backupReminderLive"><span id="backupReminderText"></span><button type="button" class="mini-btn" style="width:auto" onclick="exportFullBackup()">💾 Fai il backup</button></div>
+  <div class="card video-card" id="videoCard">
+    <div class="vc-head">
+      <h2>Video partita</h2>
+      <button type="button" class="mini-btn" style="width:auto" onclick="document.getElementById('videoFileInput').click()">📁 Carica video (mp4)</button>
+      <input type="file" id="videoFileInput" accept="video/*,.mp4,.mov,.m4v" style="display:none" onchange="videoFileChosen(this)">
+    </div>
+    <div class="vc-empty" id="vcEmpty">Carica il video della partita (mp4): resta sul tuo dispositivo e non viene caricato online. Poi sincronizza il calcio d'inizio dei due tempi: il cronometro seguirà il video.</div>
+    <div class="vc-stage" id="vcStage" style="display:none">
+      <video id="matchVideo" controls playsinline controlslist="nofullscreen" preload="metadata"></video>
+      <div class="vbug" id="vBug">
+        <div class="vb-team n"><img id="vbLogoN" class="vb-logo" alt="" style="display:none"><span id="vbBadgeN" class="vb-badge"></span><span class="vb-name" id="vbNameN"></span><span class="vb-score" id="vbScoreN">0</span></div>
+        <div class="vb-clock"><span id="vbTime">00:00</span><small id="vbExtra"></small></div>
+        <div class="vb-team a"><span class="vb-score" id="vbScoreA">0</span><span class="vb-name" id="vbNameA"></span><img id="vbLogoA" class="vb-logo" alt="" style="display:none"><span id="vbBadgeA" class="vb-badge"></span></div>
+      </div>
+      <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Schermo intero con la barra">⛶</button>
+    </div>
+    <div class="vc-sync" id="vcSync" style="display:none"></div>
+  </div>
+  <div class="card scorebug-card" id="scorebugCard">
+    <div class="scorebug" id="scorebug">
+      <div class="sg-team n">
+        <img id="sgLogoN" class="sg-logo" alt="" style="display:none"><span id="sgBadgeN" class="sg-badge"></span>
+        <span class="sg-name" id="sgNameN"></span>
+        <span class="sg-score" id="sgScoreN">0</span>
+      </div>
+      <div class="sg-clock">
+        <div class="sg-time"><span id="sgTime">00:00</span><span class="sg-extra" id="sgExtra"></span></div>
+        <div class="sg-phase" id="sgPhase">Pronti</div>
+      </div>
+      <div class="sg-team a">
+        <span class="sg-score" id="sgScoreA">0</span>
+        <span class="sg-name" id="sgNameA"></span>
+        <img id="sgLogoA" class="sg-logo" alt="" style="display:none"><span id="sgBadgeA" class="sg-badge"></span>
+      </div>
+    </div>
+    <div class="sg-controls" id="sgControls"></div>
+  </div>
   <div class="card" id="liveManualCard">
     <h2><span>Conteggio eventi</span><span class="counter-head" id="counterHead"><span></span><span id="chTeamN"></span><span id="chTeamA"></span></span></h2>
     <div class="counter-grid" id="counterList"></div>
@@ -1502,6 +1609,28 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
 
 <!-- ================= MODAL CONFERMA / INPUT (sostituisce confirm()/prompt() del browser,
      non supportati in modo affidabile dentro l'anteprima dell'artifact) ================= -->
+<div class="modal-back" id="goMinBack">
+  <div class="modal" style="max-width:380px">
+    <h3>Vai al minuto</h3>
+    <div class="gm-seg">
+      <button type="button" id="gmH1" onclick="goMinSetHalf('1')">1° tempo</button>
+      <button type="button" id="gmH2" onclick="goMinSetHalf('2')">2° tempo</button>
+    </div>
+    <div class="gm-display" id="gmDisplay">—<small id="gmHint"></small></div>
+    <div class="gm-pad">
+      <button type="button" onclick="goMinKey('1')">1</button><button type="button" onclick="goMinKey('2')">2</button><button type="button" onclick="goMinKey('3')">3</button>
+      <button type="button" onclick="goMinKey('4')">4</button><button type="button" onclick="goMinKey('5')">5</button><button type="button" onclick="goMinKey('6')">6</button>
+      <button type="button" onclick="goMinKey('7')">7</button><button type="button" onclick="goMinKey('8')">8</button><button type="button" onclick="goMinKey('9')">9</button>
+      <button type="button" class="fn" onclick="goMinKey(':')">:</button><button type="button" onclick="goMinKey('0')">0</button><button type="button" class="fn" onclick="goMinKey('del')">⌫</button>
+    </div>
+    <div class="gm-go">
+      <button type="button" class="hold" onclick="goMinApply(false)">Vai e resta in pausa</button>
+      <button type="button" class="run" onclick="goMinApply(true)">Vai e avvia</button>
+    </div>
+    <button type="button" class="gm-cancel" onclick="goMinClose()">Annulla</button>
+  </div>
+</div>
+
 <div class="modal-back" id="dialogModalBack">
   <div class="modal" style="max-width:420px">
     <h3 id="dialogTitle">Conferma</h3>
@@ -2244,6 +2373,8 @@ function freshState(){
     rosterN:[], rosterA:[], logoA:'',
     lineupN: freshLineup(), lineupA: freshLineup(),
     cornerLog:[], // {team,ts} per ogni tap sulla bandierina, per poter annullare l'ultimo corner
+    clock:{halfLen:45, phase:'idle', running:false, baseSec:0, startedAt:0}, // cronometro di partita (phase: idle|h1|ht|h2|end)
+    video:{name:'', h1Start:null, h1End:null, h2Start:null}, // sincronizzazione del video (secondi del file) con i due tempi
     notes:[] // {id,min,tempo,text}: eventi/note libere con minuto, per la timeline del report
   };
 }
@@ -2402,6 +2533,7 @@ function showConfirm(message, opts){
     document.getElementById('dialogMessage').textContent = message;
     document.getElementById('dialogInputWrap').style.display = 'none';
     document.getElementById('dialogCancelBtn').style.display = '';
+    document.getElementById('dialogCancelBtn').textContent = opts.cancelLabel || 'Annulla';
     const okBtn = document.getElementById('dialogOkBtn');
     okBtn.textContent = opts.okLabel || 'Conferma';
     okBtn.className = opts.danger ? 'btn-danger' : 'btn-save';
@@ -2419,6 +2551,7 @@ function showPrompt(message, defaultValue, opts){
     const inputWrap = document.getElementById('dialogInputWrap');
     inputWrap.style.display = '';
     document.getElementById('dialogCancelBtn').style.display = '';
+    document.getElementById('dialogCancelBtn').textContent = 'Annulla';
     const input = document.getElementById('dialogInput');
     input.value = defaultValue || '';
     const okBtn = document.getElementById('dialogOkBtn');
@@ -2770,7 +2903,9 @@ function openModal(zone){
   document.getElementById('modalPlayer').style.display='none';
   document.getElementById('modalPlayerSelect').style.display='';
   document.getElementById('manualToggleBtn').textContent = '✏️ Scrivi nome manualmente';
-  document.getElementById('modalMin').value='';
+  const ck = clockShotInfo();
+  modalClockMin = ck ? String(ck.min) : null; modalClockTempo = ck ? ck.tempo : '1';
+  document.getElementById('modalMin').value = ck ? String(ck.min) : '';
   document.getElementById('modalTempo').value='1';
   syncModalTempo();
   document.getElementById('modalOutcome').value='gol';
@@ -2844,14 +2979,16 @@ function updateXgPreview(){
 }
 /* Il tempo si ricava dal minuto: dal 46' in poi vale come 2° tempo (il 45' è ancora 1° tempo).
    Senza minuto si usa il valore di ripiego (1°). */
-const SECOND_HALF_FROM_MIN = 46;
+function secondHalfFromMin(){ return ((typeof state !== 'undefined' && state && state.clock && state.clock.halfLen) || 45) + 1; }
+let modalClockMin = null, modalClockTempo = '1';
 function tempoFromMin(min, fallback){
   const m = parseInt(min,10);
   if(isNaN(m)) return fallback || '1';
-  return m >= SECOND_HALF_FROM_MIN ? '2' : '1';
+  return m >= secondHalfFromMin() ? '2' : '1';
 }
 function syncModalTempo(){
-  const t = tempoFromMin(document.getElementById('modalMin').value, '1');
+  const v = document.getElementById('modalMin').value;
+  const t = (modalClockMin !== null && v === modalClockMin) ? modalClockTempo : tempoFromMin(v, '1');
   document.getElementById('modalTempo').value = t;
   document.getElementById('modalTempoLabel').textContent = t + '° tempo';
 }
@@ -2859,7 +2996,7 @@ function saveShot(){
   if(!pendingShot) return;
   const player = currentPlayerName();
   const min = document.getElementById('modalMin').value || '';
-  const tempo = tempoFromMin(min, document.getElementById('modalTempo').value);
+  const tempo = (modalClockMin !== null && min === modalClockMin) ? modalClockTempo : tempoFromMin(min, document.getElementById('modalTempo').value);
   const outcome = document.getElementById('modalOutcome').value;
   const actionType = document.getElementById('modalActionType').value;
   const zone = pendingShot.zone;
@@ -2936,8 +3073,11 @@ function undoLastShot(){
    taggati con un minuto, per raccontare il contesto della partita insieme ai tiri
    nella timeline del report. */
 function addNote(){
-  const minRaw = document.getElementById('noteMin').value;
-  const tempo = tempoFromMin(minRaw, document.getElementById('noteTempo').value);
+  let minRaw = document.getElementById('noteMin').value;
+  let tempo;
+  const ck = clockShotInfo();
+  if(minRaw === '' && ck){ minRaw = String(ck.min); tempo = ck.tempo; }
+  else tempo = tempoFromMin(minRaw, document.getElementById('noteTempo').value);
   const text = document.getElementById('noteText').value.trim();
   if(!text) return;
   if(!state.notes) state.notes = [];
@@ -3186,7 +3326,407 @@ function onOppLogoFileChange(evt){
 
 
 /* ---------------- SCOREBOARD (HOME) ---------------- */
+/* ---------------- CRONOMETRO DI PARTITA (stile broadcast) ----------------
+   Si calcola dall'orario di avvio (non contando i secondi), quindi resta giusto anche se
+   l'app va in secondo piano o lo schermo si blocca. Il tempo (1°/2°) dei tiri viene dalla
+   fase del cronometro, non dal numero del minuto: il recupero (45+2) resta nel 1° tempo. */
+let _clockWakeLock = null;
+function ensureClock(){
+  if(!state.clock || typeof state.clock !== 'object'){ state.clock = {halfLen:45, phase:'idle', running:false, baseSec:0, startedAt:0}; }
+  const c = state.clock;
+  if(!(c.halfLen >= 10 && c.halfLen <= 60)) c.halfLen = 45;
+  if(['idle','h1','ht','h2','end'].indexOf(c.phase) < 0) c.phase = 'idle';
+  if(typeof c.baseSec !== 'number' || isNaN(c.baseSec)) c.baseSec = 0;
+  if(c.videoDriven && !(typeof videoLoaded === 'function' && videoLoaded())){ c.videoDriven = false; c.running = false; }
+  return c;
+}
+function clockSec(){
+  const c = ensureClock();
+  if(c.videoDriven) return c.baseSec;
+  return c.baseSec + (c.running ? Math.max(0, (Date.now() - c.startedAt) / 1000) : 0);
+}
+function clockCapSec(){
+  const c = ensureClock();
+  return c.halfLen * 60 * ((c.phase === 'h2' || c.phase === 'end') ? 2 : 1);
+}
+function clockPad(n){ return (n < 10 ? '0' : '') + n; }
+function clockMinuteNow(){ return Math.floor(clockSec() / 60) + 1; }
+// info per un nuovo tiro/nota: minuto e tempo dal cronometro (solo se la partita è in corso)
+function clockShotInfo(){
+  const c = ensureClock();
+  if(c.phase !== 'h1' && c.phase !== 'h2') return null;
+  return {min: clockMinuteNow(), tempo: c.phase === 'h1' ? '1' : '2'};
+}
+function clockSave(){ saveState(); renderClockControls(); updateClockDisplay(); }
+function clockWakeLock(on){
+  try{
+    if(on && navigator.wakeLock && !_clockWakeLock){
+      navigator.wakeLock.request('screen').then(function(l){
+        _clockWakeLock = l;
+        l.addEventListener('release', function(){ _clockWakeLock = null; });
+      }).catch(function(){});
+    } else if(!on && _clockWakeLock){
+      _clockWakeLock.release().catch(function(){}); _clockWakeLock = null;
+    }
+  }catch(e){}
+}
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && typeof state !== 'undefined' && state && state.clock && state.clock.running) clockWakeLock(true);
+});
+function clockStartH1(){ const c = ensureClock(); c.phase = 'h1'; c.baseSec = 0; c.running = true; c.startedAt = Date.now(); clockSave(); }
+function clockStartH2(){ const c = ensureClock(); c.phase = 'h2'; c.baseSec = c.halfLen * 60; c.running = true; c.startedAt = Date.now(); clockSave(); }
+function clockToggle(){
+  const c = ensureClock();
+  if(c.running){ c.baseSec = clockSec(); c.running = false; }
+  else { c.startedAt = Date.now(); c.running = true; }
+  clockSave();
+}
+function clockEndHalf(){
+  const c = ensureClock();
+  c.baseSec = clockSec(); c.running = false;
+  c.phase = (c.phase === 'h1') ? 'ht' : 'end';
+  clockSave();
+}
+function clockAdjust(deltaSec){
+  const c = ensureClock();
+  const now = clockSec();
+  c.baseSec = Math.max(0, now + deltaSec);
+  if(c.running) c.startedAt = Date.now();
+  clockSave();
+}
+async function clockSetTime(){
+  const c = ensureClock();
+  const cur = clockSec();
+  const def = clockPad(Math.floor(cur / 60)) + ':' + clockPad(Math.floor(cur % 60));
+  const v = await showPrompt('Imposta il tempo mostrato dal cronometro (minuti o mm:ss, es. 23 oppure 23:40).', def, {title:'Allinea cronometro', okLabel:'Imposta'});
+  if(v === null) return;
+  const m = String(v).trim().match(/^(\d{1,3})(?:[:.]([0-5]?\d))?$/);
+  if(!m){ showAlert('Formato non valido. Scrivi per esempio 23 oppure 23:40.'); return; }
+  const sec = parseInt(m[1], 10) * 60 + (m[2] ? parseInt(m[2], 10) : 0);
+  if(sec > 130 * 60){ showAlert('Tempo troppo grande.'); return; }
+  c.baseSec = sec;
+  if(c.running) c.startedAt = Date.now();
+  clockSave();
+}
+async function clockSetDuration(){
+  const c = ensureClock();
+  if(c.phase === 'h1' || c.phase === 'h2'){ showAlert('La durata dei tempi si cambia prima del via o durante l\'intervallo.'); return; }
+  const v = await showPrompt('Durata di ogni tempo, in minuti (es. 45 oppure 40).', String(c.halfLen), {title:'Durata dei tempi', okLabel:'Salva'});
+  if(v === null) return;
+  const n = parseInt(v, 10);
+  if(!(n >= 10 && n <= 60)){ showAlert('Scrivi un numero tra 10 e 60.'); return; }
+  c.halfLen = n;
+  clockSave();
+}
+async function clockReset(){
+  const ok = await showConfirm('Azzerare il cronometro? I tiri già registrati non cambiano.', {danger:true, okLabel:'Azzera'});
+  if(!ok) return;
+  const c = ensureClock(); c.phase = 'idle'; c.running = false; c.baseSec = 0; c.startedAt = 0;
+  clockSave();
+}
+/* ---------------- VIDEO PARTITA (file mp4) con barra in sovraimpressione ----------------
+   Il file resta sul dispositivo (non viene caricato). Si sincronizzano i secondi del video con
+   l'inizio dei due tempi: da lì il cronometro segue il video (pausa, riavvolgi, salta) e
+   "Vai al minuto" sposta il video al minuto di partita scelto. I punti di sincronizzazione
+   sono salvati con la partita (e quindi nel backup); il file video va ricaricato a ogni sessione. */
+let _videoUrl = null;
+function videoEl(){ return document.getElementById('matchVideo'); }
+function videoLoaded(){ const v = videoEl(); return !!(v && v.getAttribute('src')); }
+function ensureVideoState(){
+  if(!state.video || typeof state.video !== 'object') state.video = {name:'', h1Start:null, h1End:null, h2Start:null};
+  const vs = state.video;
+  ['h1Start','h1End','h2Start'].forEach(function(k){ if(typeof vs[k] !== 'number' || isNaN(vs[k])) vs[k] = null; });
+  if(typeof vs.name !== 'string') vs.name = '';
+  return vs;
+}
+function videoFmt(t){
+  if(t == null) return '—';
+  t = Math.max(0, Math.floor(t));
+  const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), sec = t % 60;
+  return (h ? h + ':' + clockPad(m) : m) + ':' + clockPad(sec);
+}
+async function videoFileChosen(inp){
+  const file = inp.files && inp.files[0];
+  inp.value = '';
+  if(!file) return;
+  const vs = ensureVideoState();
+  const hasSync = vs.h1Start != null || vs.h2Start != null || vs.h1End != null;
+  if(hasSync && vs.name && vs.name !== file.name){
+    const keep = await showConfirm('Questo file ("' + file.name + '") è diverso da quello sincronizzato ("' + vs.name + '"). Vuoi mantenere la sincronizzazione già salvata?', {okLabel:'Mantieni', cancelLabel:'Azzera'});
+    if(!keep){ vs.h1Start = null; vs.h1End = null; vs.h2Start = null; }
+  }
+  if(_videoUrl){ try{ URL.revokeObjectURL(_videoUrl); }catch(e){} }
+  _videoUrl = URL.createObjectURL(file);
+  const v = videoEl();
+  v.src = _videoUrl;
+  v.load();
+  vs.name = file.name;
+  saveState();
+  renderVideoCard();
+}
+function renderVideoCard(){
+  const card = document.getElementById('videoCard');
+  if(!card || typeof state === 'undefined' || !state) return;
+  const vs = ensureVideoState();
+  const loaded = videoLoaded();
+  document.getElementById('tab-live').classList.toggle('has-video', loaded);
+  document.getElementById('vcStage').style.display = loaded ? '' : 'none';
+  const sync = document.getElementById('vcSync');
+  const empty = document.getElementById('vcEmpty');
+  const hasInfo = vs.name && (vs.h1Start != null || vs.h2Start != null);
+  if(!loaded){
+    sync.style.display = 'none';
+    empty.style.display = '';
+    empty.textContent = hasInfo
+      ? 'Sincronizzazione salvata per "' + vs.name + '" (1° tempo da ' + videoFmt(vs.h1Start) + ', 2° tempo da ' + videoFmt(vs.h2Start) + '). Ricarica lo stesso file per riprendere.'
+      : 'Carica il video della partita (mp4): resta sul tuo dispositivo e non viene caricato online. Poi sincronizza il calcio d\'inizio dei due tempi: il cronometro seguirà il video.';
+    return;
+  }
+  empty.style.display = 'none';
+  sync.style.display = '';
+  const b = function(label, fn, cls){ return '<button type="button" class="mini-btn ' + (cls || '') + '" onclick="' + fn + '">' + label + '</button>'; };
+  const ok = function(v){ return v != null ? ' ✓' : ''; };
+  const rate = videoEl().playbackRate || 1;
+  let h = b('Inizio 1° tempo' + ok(vs.h1Start), "videoMark('h1Start')", vs.h1Start == null ? 'vc-primary' : '') +
+          b('Fine 1° tempo' + ok(vs.h1End), "videoMark('h1End')") +
+          b('Inizio 2° tempo' + ok(vs.h2Start), "videoMark('h2Start')", (vs.h1Start != null && vs.h2Start == null) ? 'vc-primary' : '') +
+          b('Vai al minuto', 'goMinOpen()', vs.h1Start != null ? 'vc-primary' : '') +
+          b('−10s', 'videoSeekBy(-10)') + b('+10s', 'videoSeekBy(10)') +
+          '<select id="vcRate" onchange="videoSetRate(this.value)">' +
+          [0.5, 1, 1.5, 2].map(function(r){ return '<option value="' + r + '"' + (r === rate ? ' selected' : '') + '>' + r + '×</option>'; }).join('') + '</select>' +
+          b('Azzera sync', 'videoClearSync()');
+  h += '<div class="vc-status">Video: <b>' + escapeXml(vs.name || '') + '</b><br>' +
+       'Inizio 1° tempo: <b>' + videoFmt(vs.h1Start) + '</b> · Fine 1° tempo: <b>' + videoFmt(vs.h1End) + '</b> · Inizio 2° tempo: <b>' + videoFmt(vs.h2Start) + '</b>' +
+       (vs.h1Start == null ? '<br>Porta il video al calcio d\'inizio e tocca “Inizio 1° tempo”.' : '') + '</div>';
+  if(sync.getAttribute('data-sig') !== h){ sync.innerHTML = h; sync.setAttribute('data-sig', h); }
+}
+function videoMark(key){
+  const v = videoEl(); if(!v) return;
+  const vs = ensureVideoState();
+  const t = v.currentTime;
+  if(key === 'h1End' && vs.h1Start != null && t <= vs.h1Start){ showAlert('La fine del 1° tempo deve venire dopo l\'inizio.'); return; }
+  if(key === 'h2Start' && vs.h1Start != null && t <= vs.h1Start){ showAlert('L\'inizio del 2° tempo deve venire dopo l\'inizio del 1°.'); return; }
+  vs[key] = t;
+  saveState();
+  renderVideoCard();
+  videoTick();
+}
+function videoClearSync(){
+  showConfirm('Azzerare la sincronizzazione del video? I tiri già registrati non cambiano.', {danger:true, okLabel:'Azzera'}).then(function(ok){
+    if(!ok) return;
+    const vs = ensureVideoState(); vs.h1Start = null; vs.h1End = null; vs.h2Start = null;
+    const c = ensureClock(); c.videoDriven = false; c.phase = 'idle'; c.baseSec = 0; c.running = false;
+    saveState(); renderVideoCard(); renderClockControls(); updateClockDisplay();
+  });
+}
+function videoSeekBy(d){ const v = videoEl(); if(v){ v.currentTime = Math.max(0, Math.min(v.duration || 1e9, v.currentTime + d)); videoTick(); } }
+function videoSetRate(r){ const v = videoEl(); if(v) v.playbackRate = parseFloat(r) || 1; }
+function videoFullscreen(){
+  const st = document.getElementById('vcStage');
+  try{
+    if(document.fullscreenElement){ document.exitFullscreen(); }
+    else if(st.requestFullscreen){ st.requestFullscreen(); }
+    else if(st.webkitRequestFullscreen){ st.webkitRequestFullscreen(); }
+  }catch(e){}
+}
+function videoMode(){ return videoLoaded() && ensureVideoState().h1Start != null; }
+function videoDerived(){
+  const vs = ensureVideoState(), v = videoEl(), t = v.currentTime, half = ensureClock().halfLen * 60;
+  if(vs.h1Start == null || t < vs.h1Start) return {phase:'idle', sec:0};
+  if(vs.h2Start != null && t >= vs.h2Start) return {phase:'h2', sec: half + (t - vs.h2Start)};
+  if(vs.h1End != null && t >= vs.h1End) return {phase:'ht', sec: vs.h1End - vs.h1Start};
+  return {phase:'h1', sec: t - vs.h1Start};
+}
+let _videoSig = '';
+function videoTick(){
+  if(typeof state === 'undefined' || !state || !document.getElementById('matchVideo')) return;
+  const c = ensureClock();
+  if(videoMode()){
+    const d = videoDerived();
+    c.videoDriven = true; c.phase = d.phase; c.baseSec = d.sec; c.running = !videoEl().paused;
+    const sig = d.phase + '|' + c.running;
+    if(sig !== _videoSig){ _videoSig = sig; renderClockControls(); }
+    updateClockDisplay();
+  } else if(c.videoDriven){
+    c.videoDriven = false; c.running = false; renderClockControls();
+  }
+}
+function updateVideoOverlay(){
+  if(!document.getElementById('vbNameN')) return;
+  const bug = document.getElementById('vBug');
+  if(!bug) return;
+  bug.style.setProperty('--sg-cn', state.colorN || '#2563eb');
+  bug.style.setProperty('--sg-ca', state.colorA || '#ea580c');
+  ['N', 'A'].forEach(function(k){
+    document.getElementById('vbName' + k).textContent = document.getElementById('sgName' + k).textContent;
+    document.getElementById('vbScore' + k).textContent = document.getElementById('sgScore' + k).textContent;
+    const src = document.getElementById('sgLogo' + k);
+    const img = document.getElementById('vbLogo' + k), badge = document.getElementById('vbBadge' + k);
+    if(src.style.display !== 'none' && src.getAttribute('src')){
+      if(img.getAttribute('src') !== src.getAttribute('src')) img.src = src.getAttribute('src');
+      img.style.display = ''; badge.style.display = 'none';
+    } else {
+      const sb = document.getElementById('sgBadge' + k);
+      img.style.display = 'none'; badge.style.display = ''; badge.textContent = sb.textContent; badge.style.background = sb.style.background;
+    }
+  });
+}
+(function initVideoUi(){
+  window.addEventListener('load', function(){
+    const v = videoEl();
+    if(v){
+      ['timeupdate', 'seeked', 'seeking', 'play', 'pause', 'loadedmetadata'].forEach(function(ev){ v.addEventListener(ev, videoTick); });
+      v.addEventListener('loadedmetadata', renderVideoCard);
+      v.addEventListener('ratechange', function(){ const sel = document.getElementById('vcRate'); if(sel) sel.value = String(v.playbackRate); });
+    }
+    const setH = function(){ const h = document.querySelector('header.top'); if(h) document.documentElement.style.setProperty('--hdr-h', h.offsetHeight + 'px'); };
+    setH(); window.addEventListener('resize', setH); setTimeout(setH, 800);
+    setInterval(videoTick, 100);
+  });
+})();
+
+/* ---- Tastierino "Vai al minuto": porta il cronometro al minuto che ti serve (1° o 2° tempo) ---- */
+let goMinText = '', goMinHalf = '1';
+function goMinParse(){
+  const m = goMinText.match(/^(\d{1,3})(?::([0-5]?\d))?$/);
+  if(!m) return null;
+  return {min: parseInt(m[1], 10), sec: m[2] ? parseInt(m[2], 10) : 0};
+}
+function goMinRender(){
+  const c = ensureClock();
+  document.getElementById('gmH1').classList.toggle('on', goMinHalf === '1');
+  document.getElementById('gmH2').classList.toggle('on', goMinHalf === '2');
+  const disp = document.getElementById('gmDisplay');
+  const hint = document.getElementById('gmHint');
+  const v = goMinParse();
+  let hintTxt = '';
+  if(goMinText === '') hintTxt = 'Scrivi il minuto (es. 23 oppure 23:40)';
+  else if(!v) hintTxt = 'Formato non valido';
+  else if(goMinHalf === '2' && v.min <= c.halfLen) hintTxt = 'Nel 2° tempo si parte dal ' + (c.halfLen + 1) + "'";
+  else if(goMinHalf === '1' && v.min > c.halfLen) hintTxt = 'Recupero del 1° tempo: ' + c.halfLen + '+' + (v.min - c.halfLen);
+  else hintTxt = 'Il cronometro andrà a ' + clockPad(v.min) + ':' + clockPad(v.sec);
+  disp.firstChild.nodeValue = goMinText === '' ? '—' : goMinText;
+  hint.textContent = hintTxt;
+}
+function goMinOpen(){
+  const c = ensureClock();
+  goMinText = '';
+  goMinHalf = (c.phase === 'h2' || c.phase === 'ht' || c.phase === 'end') ? '2' : '1';
+  goMinRender();
+  document.getElementById('goMinBack').classList.add('open');
+}
+function goMinClose(){ document.getElementById('goMinBack').classList.remove('open'); }
+function goMinSetHalf(h){ goMinHalf = h; goMinRender(); }
+function goMinKey(k){
+  if(k === 'del'){ goMinText = goMinText.slice(0, -1); }
+  else if(k === ':'){ if(goMinText !== '' && goMinText.indexOf(':') < 0) goMinText += ':'; }
+  else {
+    const next = goMinText + k;
+    if(/^\d{0,3}(:\d{0,2})?$/.test(next)) goMinText = next;
+  }
+  goMinRender();
+}
+function goMinApply(run){
+  const c = ensureClock();
+  const v = goMinParse();
+  if(!v){ goMinRender(); return; }
+  if(v.min > 130){ document.getElementById('gmHint').textContent = 'Minuto troppo grande'; return; }
+  if(goMinHalf === '2' && v.min <= c.halfLen){ document.getElementById('gmHint').textContent = 'Nel 2° tempo si parte dal ' + (c.halfLen + 1) + "'"; return; }
+  if(videoLoaded()){
+    const vs = ensureVideoState(), vid = videoEl(), half = c.halfLen * 60, target = v.min * 60 + v.sec;
+    let t;
+    if(goMinHalf === '1'){
+      if(vs.h1Start == null){ document.getElementById('gmHint').textContent = "Prima sincronizza l'inizio del 1° tempo"; return; }
+      t = vs.h1Start + target;
+    } else {
+      if(vs.h2Start == null){ document.getElementById('gmHint').textContent = "Prima sincronizza l'inizio del 2° tempo"; return; }
+      t = vs.h2Start + (target - half);
+    }
+    const dur = isFinite(vid.duration) ? vid.duration : t;
+    vid.currentTime = Math.max(0, Math.min(dur, t));
+    if(run) vid.play().catch(function(){}); else vid.pause();
+    goMinClose(); videoTick();
+    return;
+  }
+  c.phase = goMinHalf === '1' ? 'h1' : 'h2';
+  c.baseSec = v.min * 60 + v.sec;
+  c.running = !!run;
+  c.startedAt = Date.now();
+  goMinClose();
+  clockSave();
+}
+function renderClockControls(){
+  const box = document.getElementById('sgControls');
+  if(!box || typeof state === 'undefined' || !state) return;
+  const c = ensureClock();
+  if(c.videoDriven){ if(box.innerHTML !== ''){ box.innerHTML = ''; box.setAttribute('data-sig', ''); } return; }
+  const b = function(label, fn, cls){ return '<button type="button" class="mini-btn '+(cls||'')+'" onclick="'+fn+'">'+label+'</button>'; };
+  let h = '';
+  if(c.phase === 'idle'){
+    h = b('▶ Inizio 1° tempo', 'clockStartH1()', 'sg-primary') + b('Vai al minuto', 'goMinOpen()') + b('⏱ Durata tempi: '+c.halfLen+"'", 'clockSetDuration()');
+  } else if(c.phase === 'h1' || c.phase === 'h2'){
+    h = b(c.running ? 'Pausa' : '▶ Riprendi', 'clockToggle()', 'sg-primary') +
+        b('−10s', 'clockAdjust(-10)') + b('+10s', 'clockAdjust(10)') + b('+1\'', 'clockAdjust(60)') +
+        b('Vai al minuto', 'goMinOpen()') +
+        b(c.phase === 'h1' ? 'Fine 1° tempo' : 'Fine partita', 'clockEndHalf()');
+  } else if(c.phase === 'ht'){
+    h = b('▶ Inizio 2° tempo', 'clockStartH2()', 'sg-primary') + b('Vai al minuto', 'goMinOpen()') + b('⏱ Durata tempi: '+c.halfLen+"'", 'clockSetDuration()');
+  } else {
+    h = b('Vai al minuto', 'goMinOpen()') + b('↺ Azzera cronometro', 'clockReset()');
+  }
+  if(c.phase === 'h1' || c.phase === 'h2' || c.phase === 'ht'){ h += b('↺', 'clockReset()'); }
+  if(box.getAttribute('data-sig') !== h){ box.innerHTML = h; box.setAttribute('data-sig', h); }
+  clockWakeLock(!!c.running);
+}
+function updateClockDisplay(){
+  const t = document.getElementById('sgTime');
+  if(!t || typeof state === 'undefined' || !state) return;
+  const c = ensureClock();
+  const sec = clockSec();
+  const cap = clockCapSec();
+  let main = sec, extra = '';
+  if(sec > cap && (c.phase === 'h1' || c.phase === 'h2' || c.phase === 'ht' || c.phase === 'end')){
+    main = cap;
+    const ex = Math.floor(sec - cap);
+    extra = '+' + clockPad(Math.floor(ex / 60)) + ':' + clockPad(ex % 60);
+  }
+  t.textContent = clockPad(Math.floor(main / 60)) + ':' + clockPad(Math.floor(main % 60));
+  document.getElementById('sgExtra').textContent = extra;
+  const vbT = document.getElementById('vbTime');
+  if(vbT){ vbT.textContent = t.textContent; document.getElementById('vbExtra').textContent = extra; }
+  const ph = document.getElementById('sgPhase');
+  let txt = 'Pronti', cls = 'sg-phase';
+  if(c.phase === 'h1' || c.phase === 'h2'){
+    txt = (c.phase === 'h1' ? '1° tempo' : '2° tempo');
+    if(c.running) cls += ' live'; else { txt += ' · in pausa'; cls += ' paused'; }
+  } else if(c.phase === 'ht'){ txt = 'Intervallo'; }
+  else if(c.phase === 'end'){ txt = 'Fine partita'; }
+  if(ph.textContent !== txt) ph.textContent = txt;
+  if(ph.className !== cls) ph.className = cls;
+}
+function updateScorebug(){
+  if(typeof state === 'undefined' || !state || !document.getElementById('sgNameN')) return;
+  const bug = document.getElementById('scorebug');
+  bug.style.setProperty('--sg-cn', state.colorN || '#2563eb');
+  bug.style.setProperty('--sg-ca', state.colorA || '#ea580c');
+  document.getElementById('sgNameN').textContent = state.teamN;
+  document.getElementById('sgNameA').textContent = state.teamA;
+  const golN = (state.counters.gol_live && state.counters.gol_live.n) || 0;
+  const golA = (state.counters.gol_live && state.counters.gol_live.a) || 0;
+  document.getElementById('sgScoreN').textContent = golN;
+  document.getElementById('sgScoreA').textContent = golA;
+  [['N', (typeof myTeam !== 'undefined' && myTeam) ? myTeam.logo : '', state.teamN, state.colorN],
+   ['A', state.logoA, state.teamA, state.colorA]].forEach(function(t){
+    const img = document.getElementById('sgLogo' + t[0]);
+    const badge = document.getElementById('sgBadge' + t[0]);
+    if(t[1]){ if(img.getAttribute('src') !== t[1]) img.src = t[1]; img.style.display = ''; badge.style.display = 'none'; }
+    else { img.style.display = 'none'; badge.style.display = ''; badge.textContent = (t[2] || '?').trim().charAt(0).toUpperCase(); badge.style.background = t[3] || '#334155'; }
+  });
+}
+setInterval(function(){ if(!document.hidden) updateClockDisplay(); }, 250);
+
 function renderScoreboard(){
+  updateScorebug(); renderClockControls(); updateClockDisplay(); updateVideoOverlay(); renderVideoCard();
   document.getElementById('sbTeamN').textContent = state.teamN;
   document.getElementById('sbTeamA').textContent = state.teamA;
   const golN = (state.counters.gol_live && state.counters.gol_live.n) || 0;
