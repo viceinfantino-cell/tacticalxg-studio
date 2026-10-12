@@ -1116,7 +1116,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Modalità studio a schermo intero: video sopra, campetto sotto">⛶</button>
     </div></div>
     <div class="vc-sync" id="vcSync" style="display:none"></div>
-    <div class="vc-ver">Versione app: 12</div>
+    <div class="vc-ver">Versione app: 13</div>
   </div>
   <div class="card scorebug-card" id="scorebugCard">
     <div class="tbug" id="scorebug">
@@ -1325,6 +1325,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
     <div class="row-btns">
       <button class="mini-btn" onclick="exportCSV()">⬇ Esporta tiri (CSV)</button>
       <button class="mini-btn" id="exportTiriPdfBtn" onclick="exportTiriPDF()">📄 Esporta tiri (PDF)</button>
+      <button class="mini-btn" onclick="clipOpen()">🎬 Esporta clip tiri (video)</button>
       <button class="mini-btn danger" onclick="resetAll()">🗑 Azzera tutti i dati</button>
     </div>
   </div>
@@ -3802,8 +3803,16 @@ function clipUpdateInfo(){
   document.getElementById('clipInfo').textContent = t;
   document.getElementById('clipGoBtn').disabled = !f.withVt.length;
 }
-function clipOpen(){
-  if(!videoLoaded()){ showAlert('Carica prima il video della partita (mp4).'); return; }
+function clipGoHome(){
+  const tb = document.querySelector('.tab-btn[data-tab="live"]');
+  if(tb && !document.getElementById('tab-live').classList.contains('active')) tb.click();
+}
+async function clipOpen(){
+  if(!videoLoaded()){
+    const go = await showConfirm('Per creare il video dei tiri serve il video della partita (mp4) caricato nella scheda Home. Vuoi andare alla Home per caricarlo?', {title:'Video non caricato', okLabel:'Vai alla Home', cancelLabel:'Annulla'});
+    if(go){ clipGoHome(); const c = document.getElementById('videoCard'); if(c && c.scrollIntoView) c.scrollIntoView({block:'center'}); }
+    return;
+  }
   document.getElementById('clipForm').style.display = '';
   document.getElementById('clipProg').style.display = 'none';
   clipUpdateInfo();
@@ -3937,6 +3946,8 @@ async function clipStart(){
     return;
   }
   clipBusy = true; clipCancel = false;
+  clipGoHome();   // il video deve essere visibile per essere registrato
+  await clipSleep(150);
   document.getElementById('clipForm').style.display = 'none';
   document.getElementById('clipProg').style.display = '';
   const txt = document.getElementById('clipProgText'), bar = document.getElementById('clipProgBar');
