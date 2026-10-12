@@ -102,6 +102,7 @@ input.colorpick::-moz-color-swatch{border:none;border-radius:50%;}
   border:none;background:transparent;font-weight:700;font-size:14px;color:var(--text);
   width:110px;outline:none;
 }
+.team-chip input.abbr-input{width:46px;border-left:1px solid var(--border);padding-left:8px;text-transform:uppercase;font-size:12px;letter-spacing:.04em;text-align:center;}
 .matches-menu{position:relative;}
 .matches-panel{
   display:none; position:absolute; top:calc(100% + 8px); right:0; z-index:60;
@@ -323,8 +324,7 @@ nav.tabs button.active{background:var(--brand);color:#ffffff;border-color:var(--
 .vc-stage video{width:100%;display:block;max-height:58vh;background:#000;}
 .vc-fs{position:absolute;right:10px;top:10px;z-index:5;background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.25);
   border-radius:8px;padding:5px 9px;font-size:14px;cursor:pointer;}
-.vbug{position:absolute;left:12px;top:12px;z-index:4;display:flex;align-items:stretch;pointer-events:none;
-  background:rgba(8,10,15,.88);color:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.45);font-size:15px;}
+.vbug{position:absolute;left:12px;top:12px;z-index:4;display:flex;pointer-events:none;}
 .vb-team{display:flex;align-items:center;gap:7px;padding:5px 9px;}
 .vb-team.n{border-left:5px solid var(--sg-cn,#2563eb);} .vb-team.a{border-right:5px solid var(--sg-ca,#ea580c);}
 .vb-logo{width:26px;height:26px;object-fit:contain;} .vb-badge{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;}
@@ -345,6 +345,56 @@ nav.tabs button.active{background:var(--brand);color:#ffffff;border-color:var(--
   #tab-live.active.has-video > :not(.video-card){grid-column:2;}
 }
 .has-video > #scorebugCard{display:none;}
+/* ===== modalità studio: video sopra, campetto sotto (schermo intero) ===== */
+.studio-bar{display:none;}
+.vc-slot{display:block;}
+body.studio-on{overflow:hidden;}
+body.studio-on #tab-live.active{
+  position:fixed;inset:0;z-index:90;background:var(--bg);padding:8px;margin:0;gap:8px;overflow:hidden;
+  display:grid !important;align-items:stretch !important;
+  grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) !important;
+  grid-template-rows:auto var(--st-v,52%) minmax(0,1fr) !important;
+  grid-template-areas:"bar bar" "video video" "pitch manual" !important;
+}
+body.studio-on.studio-side #tab-live.active{
+  grid-template-columns:minmax(0,var(--st-vf,60fr)) minmax(0,var(--st-wf,40fr)) !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  grid-template-areas:"bar bar" "video pitch" "video manual" !important;
+}
+body.studio-on #tab-live.active > *{min-width:0;min-height:0;}
+body.studio-on #tab-live.active > *:not(.studio-bar):not(#videoCard):not(#liveManualCard):not(.home-pitch-card){display:none !important;}
+body.studio-on #tab-live.active > .studio-bar{display:flex;grid-area:bar !important;align-items:center;gap:6px 12px;flex-wrap:wrap;
+  background:var(--card);border:1px solid var(--border);border-radius:10px;padding:5px 10px;font-size:12.5px;font-weight:700;}
+.studio-bar label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;}
+.studio-bar input[type=range]{width:110px;vertical-align:middle;}
+.studio-bar .st-title{font-weight:900;letter-spacing:.04em;text-transform:uppercase;font-size:11.5px;color:var(--text-soft);}
+.studio-bar .st-hint{color:var(--text-soft);font-weight:600;font-size:11.5px;margin-left:auto;}
+.studio-bar button{padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:800;font-size:12.5px;cursor:pointer;}
+.studio-bar button.st-exit{background:var(--red,#dc2626);color:#fff;border-color:transparent;}
+body.studio-on #tab-live.active > #videoCard{grid-area:video !important;position:static !important;margin:0 !important;padding:6px;
+  display:flex;flex-direction:column;overflow:hidden;}
+body.studio-on #videoCard .vc-head{display:none;}
+body.studio-on #videoCard .vc-slot{flex:1 1 0;min-height:0;container-type:size;display:flex;justify-content:center;align-items:center;}
+body.studio-on #videoCard .vc-stage{flex:none;width:min(100cqw, calc(100cqh * var(--vr,1.7778)));aspect-ratio:var(--vr,1.7778);border-radius:8px;}
+body.studio-on #videoCard .vc-stage video{width:100%;height:100%;max-height:none;object-fit:contain;}
+body.studio-on #videoCard .vc-sync{flex:none;margin-top:6px;gap:5px;}
+body.studio-on #videoCard .vc-status{display:none;}
+body.studio-on #tab-live.active > .home-pitch-card{grid-area:pitch !important;margin:0 !important;padding:8px;display:flex;flex-direction:column;max-width:none;}
+body.studio-on .home-pitch-card > h2, body.studio-on .home-pitch-card .legend-row, body.studio-on .home-pitch-card .hint{display:none;}
+body.studio-on .home-pitch-card .pitch-wrap{flex:1 1 0;min-height:0;container-type:size;justify-content:center;align-items:center;gap:0;}
+body.studio-on .home-pitch-card svg.pitch-home{width:min(100cqw, calc(100cqh * 600 / 340)) !important;max-width:none !important;height:auto;aspect-ratio:600/340;flex:none;}
+body.studio-on #tab-live.active > #liveManualCard{grid-area:manual !important;margin:0 !important;overflow:auto;}
+body.studio-on:not(.studio-side) #modalBack{top:calc(var(--st-v,52%) + 46px);}
+body.studio-on.studio-side #modalBack{left:calc(var(--st-v,60%) + 8px);}
+body.studio-on #modalBack .modal{max-height:100%;}
+@media (max-width:899px){
+  body.studio-on #tab-live.active, body.studio-on.studio-side #tab-live.active{
+    grid-template-columns:minmax(0,1fr) !important;grid-template-rows:auto var(--st-v,52%) minmax(0,1fr) !important;
+    grid-template-areas:"bar" "video" "pitch" !important;}
+  body.studio-on #tab-live.active > #liveManualCard{display:none !important;}
+  body.studio-on.studio-side #modalBack{left:0;}
+  body.studio-on.studio-side #modalBack{top:calc(var(--st-v,52%) + 46px);}
+}
 /* tastierino "Vai al minuto" */
 .gm-display{font-size:40px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.04em;
   background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:8px 10px;margin:4px 0 10px;min-height:62px;}
@@ -360,6 +410,25 @@ nav.tabs button.active{background:var(--brand);color:#ffffff;border-color:var(--
 .gm-go button{flex:1;padding:14px 8px;border-radius:12px;border:none;font-weight:800;font-size:15px;cursor:pointer;}
 .gm-go .run{background:var(--blue);color:#fff;} .gm-go .hold{background:var(--border);color:var(--text);}
 .gm-cancel{display:block;width:100%;margin-top:8px;background:none;border:none;color:var(--text-soft);font-weight:700;font-size:14px;padding:8px;cursor:pointer;}
+/* tabellone in stile broadcast: logo IV + tempo | sigle | risultato */
+.tbug{display:inline-flex;align-items:stretch;font-size:var(--tb-fs,20px);line-height:1;border-radius:.3em;overflow:hidden;
+  box-shadow:0 .4em 1.1em rgba(0,0,0,.4);font-family:inherit;text-align:left;}
+.tb-left{display:flex;flex-direction:column;width:5.4em;}
+.tb-top{background:#fff;height:3.3em;display:flex;align-items:center;justify-content:center;padding:.2em .3em;}
+.tb-brand{max-width:100%;max-height:100%;object-fit:contain;display:block;}
+.tb-time{background:#14226b;color:#fff;height:2.3em;display:flex;align-items:center;justify-content:center;gap:.3em;
+  font-weight:900;font-size:1.15em;font-variant-numeric:tabular-nums;letter-spacing:.02em;}
+.tb-time small, .tb-extra{font-size:.62em;color:#fbbf24;font-weight:800;}
+.tb-mid{background:#1c1c1e;color:#fff;display:grid;grid-template-rows:1fr 1fr;min-width:4.6em;}
+.tb-mid span{display:flex;align-items:center;justify-content:center;padding:0 .8em;font-weight:900;font-size:1.2em;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;}
+.tb-score{background:#fafafa;color:#111;display:grid;grid-template-rows:1fr 1fr;min-width:3.1em;}
+.tb-sc{display:flex;align-items:center;justify-content:center;border-left:.32em solid var(--tb-c,#999);}
+.tb-sc.n{--tb-c:var(--sg-cn,#2563eb);} .tb-sc.a{--tb-c:var(--sg-ca,#ea580c);border-top:1px solid #c7c7c7;}
+.tb-sc b{font-size:1.65em;font-weight:900;font-variant-numeric:tabular-nums;padding:0 .35em;}
+.scorebug-card{text-align:center;}
+.scorebug-card .tbug{--tb-fs:22px;}
+@media (max-width:560px){ .scorebug-card .tbug{--tb-fs:18px;} }
+.vbug .tbug{--tb-fs:15px;}
 /* cronometro di partita in stile broadcast (loghi, risultato, tempo) */
 .scorebug-card{padding:10px 12px;margin-bottom:10px;}
 .scorebug{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;background:#0b0d12;color:#fff;
@@ -981,8 +1050,8 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
   </div>
   <div class="teams-bar">
     <button class="icon-btn icon-btn-home" onclick="showLanding()" title="Torna alla Home">🏠</button>
-    <div class="team-chip"><input id="colorN" class="colorpick" type="color" value="#2563eb"><input id="teamN" type="text" value="Nostra"></div>
-    <div class="team-chip"><input id="colorA" class="colorpick" type="color" value="#ea580c"><input id="teamA" type="text" value="Avversaria"></div>
+    <div class="team-chip"><input id="colorN" class="colorpick" type="color" value="#2563eb"><input id="teamN" type="text" value="Nostra"><input id="abbrN" class="abbr-input" type="text" maxlength="4" placeholder="SIG" title="Sigla nel tabellone (separata dal nome)"></div>
+    <div class="team-chip"><input id="colorA" class="colorpick" type="color" value="#ea580c"><input id="teamA" type="text" value="Avversaria"><input id="abbrA" class="abbr-input" type="text" maxlength="4" placeholder="SIG" title="Sigla nel tabellone (separata dal nome)"></div>
     <button class="icon-btn" id="themeToggle" onclick="toggleAppTheme()" title="Cambia tema">🌙</button>
     <button class="icon-btn" onclick="openSettings()" title="Squadre e distinte">⚙️</button>
     <div class="matches-menu">
@@ -1008,6 +1077,15 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
 
 <!-- ================= TAB LIVE ================= -->
 <div class="tabpanel active" id="tab-live">
+  <div class="studio-bar" id="studioBar">
+    <span class="st-title">Modalità studio</span>
+    <label><input type="checkbox" id="stPause" onchange="studioPrefChanged()"> Pausa al tocco</label>
+    <label><input type="checkbox" id="stBack" onchange="studioPrefChanged()"> Riprendi −5s</label>
+    <button type="button" id="stMode" onclick="studioToggleMode()">Affianca</button>
+    <label>Video <input type="range" id="stSplit" min="30" max="75" step="1" oninput="studioSetSplit(this.value)"></label>
+    <span class="st-hint">Spazio ▶/⏸ · ←/→ ±5s · Z annulla ultimo tiro</span>
+    <button type="button" class="st-exit" onclick="studioExit()">✕ Esci</button>
+  </div>
   <div class="backup-reminder" id="backupReminderLive"><span id="backupReminderText"></span><button type="button" class="mini-btn" style="width:auto" onclick="exportFullBackup()">💾 Fai il backup</button></div>
   <div class="card video-card" id="videoCard">
     <div class="vc-head">
@@ -1016,34 +1094,32 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <input type="file" id="videoFileInput" accept="video/*,.mp4,.mov,.m4v" style="display:none" onchange="videoFileChosen(this)">
     </div>
     <div class="vc-empty" id="vcEmpty">Carica il video della partita (mp4): resta sul tuo dispositivo e non viene caricato online. Poi sincronizza il calcio d'inizio dei due tempi: il cronometro seguirà il video.</div>
-    <div class="vc-stage" id="vcStage" style="display:none">
+    <div class="vc-slot" id="vcSlot"><div class="vc-stage" id="vcStage" style="display:none">
       <video id="matchVideo" controls playsinline controlslist="nofullscreen" preload="metadata"></video>
       <div class="vbug" id="vBug">
-        <div class="vb-team n"><img id="vbLogoN" class="vb-logo" alt="" style="display:none"><span id="vbBadgeN" class="vb-badge"></span><span class="vb-name" id="vbNameN"></span><span class="vb-score" id="vbScoreN">0</span></div>
-        <div class="vb-clock"><span id="vbTime">00:00</span><small id="vbExtra"></small></div>
-        <div class="vb-team a"><span class="vb-score" id="vbScoreA">0</span><span class="vb-name" id="vbNameA"></span><img id="vbLogoA" class="vb-logo" alt="" style="display:none"><span id="vbBadgeA" class="vb-badge"></span></div>
+        <div class="tbug">
+          <div class="tb-left">
+            <div class="tb-top"><img class="tb-brand" alt="IV"></div>
+            <div class="tb-time"><span id="vbTime">00:00</span><span class="tb-extra" id="vbExtra"></span></div>
+          </div>
+          <div class="tb-mid"><span id="vbNameN"></span><span id="vbNameA"></span></div>
+          <div class="tb-score"><div class="tb-sc n"><b id="vbScoreN">0</b></div><div class="tb-sc a"><b id="vbScoreA">0</b></div></div>
+        </div>
       </div>
-      <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Schermo intero con la barra">⛶</button>
-    </div>
+      <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Modalità studio a schermo intero: video sopra, campetto sotto">⛶</button>
+    </div></div>
     <div class="vc-sync" id="vcSync" style="display:none"></div>
   </div>
   <div class="card scorebug-card" id="scorebugCard">
-    <div class="scorebug" id="scorebug">
-      <div class="sg-team n">
-        <img id="sgLogoN" class="sg-logo" alt="" style="display:none"><span id="sgBadgeN" class="sg-badge"></span>
-        <span class="sg-name" id="sgNameN"></span>
-        <span class="sg-score" id="sgScoreN">0</span>
+    <div class="tbug" id="scorebug">
+      <div class="tb-left">
+        <div class="tb-top"><img class="tb-brand" alt="IV Football Match Analyst"></div>
+        <div class="tb-time"><span id="sgTime">00:00</span><span class="tb-extra" id="sgExtra"></span></div>
       </div>
-      <div class="sg-clock">
-        <div class="sg-time"><span id="sgTime">00:00</span><span class="sg-extra" id="sgExtra"></span></div>
-        <div class="sg-phase" id="sgPhase">Pronti</div>
-      </div>
-      <div class="sg-team a">
-        <span class="sg-score" id="sgScoreA">0</span>
-        <span class="sg-name" id="sgNameA"></span>
-        <img id="sgLogoA" class="sg-logo" alt="" style="display:none"><span id="sgBadgeA" class="sg-badge"></span>
-      </div>
+      <div class="tb-mid"><span id="sgNameN"></span><span id="sgNameA"></span></div>
+      <div class="tb-score"><div class="tb-sc n"><b id="sgScoreN">0</b></div><div class="tb-sc a"><b id="sgScoreA">0</b></div></div>
     </div>
+    <div class="sg-phase" id="sgPhase">Pronti</div>
     <div class="sg-controls" id="sgControls"></div>
   </div>
   <div class="card" id="liveManualCard">
@@ -2138,7 +2214,7 @@ async function exportFullBackup(){
     const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], {type:'application/json'});
     const dateStr = new Date().toISOString().slice(0,10);
-    const saved = await saveFileViaDownloads('tacticalxg_backup_'+dateStr+'.json', blob);
+    const saved = await saveFileViaDownloads('TacticalXG_backup.json', blob);
     if(saved === false){ setBackupStatus('Backup annullato: non è stato salvato.', ''); return; }
     try{ localStorage.setItem('txg_last_backup', String(Date.now())); localStorage.removeItem('txg_dirty'); }catch(e){}
     updateBackupReminder();
@@ -2368,6 +2444,7 @@ function freshState(){
   LIVE_METRICS.forEach(m=>c[m.key]={n:0,a:0});
   return {
     teamN:"Nostra", teamA:"Avversaria",
+    abbrN:"", abbrA:"", // sigle nel tabellone (separate dai nomi squadra)
     colorN:"#2563eb", colorA:"#ea580c",
     counters:c, shots:[],
     rosterN:[], rosterA:[], logoA:'',
@@ -2916,11 +2993,13 @@ function openModal(zone){
   if(advDetails) advDetails.open = false;
   setModalTeam('n');
   updateXgPreview();
+  studioModalOpened();
   document.getElementById('modalBack').classList.add('open');
 }
 function closeModal(){
   document.getElementById('modalBack').classList.remove('open');
   pendingShot = null;
+  studioModalClosed();
 }
 function setModalTeam(t){
   modalTeam = t;
@@ -3013,7 +3092,7 @@ function saveShot(){
   state.shots.push({
     team: modalTeam, player, min, tempo, outcome, actionType, zone,
     x: pendingShot.x, y: pendingShot.y, xg, cutback: isCutback, verticalizzazione: isVerticalizzazione,
-    id: shotId
+    id: shotId, vt: (modalVideoT != null ? Math.round(modalVideoT * 10) / 10 : undefined)
   });
 
   // Aggiornamento automatico dei contatori live in base a zona ed esito
@@ -3491,7 +3570,7 @@ function renderVideoCard(){
           b('Fine 1° tempo' + ok(vs.h1End), "videoMark('h1End')") +
           b('Inizio 2° tempo' + ok(vs.h2Start), "videoMark('h2Start')", (vs.h1Start != null && vs.h2Start == null) ? 'vc-primary' : '') +
           b('Vai al minuto', 'goMinOpen()', vs.h1Start != null ? 'vc-primary' : '') +
-          b('−10s', 'videoSeekBy(-10)') + b('+10s', 'videoSeekBy(10)') +
+          b('Play/Pausa', 'videoTogglePlay()') + b('−10s', 'videoSeekBy(-10)') + b('+10s', 'videoSeekBy(10)') +
           '<select id="vcRate" onchange="videoSetRate(this.value)">' +
           [0.5, 1, 1.5, 2].map(function(r){ return '<option value="' + r + '"' + (r === rate ? ' selected' : '') + '>' + r + '×</option>'; }).join('') + '</select>' +
           b('Azzera sync', 'videoClearSync()');
@@ -3521,14 +3600,111 @@ function videoClearSync(){
 }
 function videoSeekBy(d){ const v = videoEl(); if(v){ v.currentTime = Math.max(0, Math.min(v.duration || 1e9, v.currentTime + d)); videoTick(); } }
 function videoSetRate(r){ const v = videoEl(); if(v) v.playbackRate = parseFloat(r) || 1; }
-function videoFullscreen(){
-  const st = document.getElementById('vcStage');
+function videoTogglePlay(){ const v = videoEl(); if(!v) return; if(v.paused){ const p = v.play(); if(p && p.catch) p.catch(function(){}); } else v.pause(); }
+/* ---- Modalità studio: schermo intero con video sopra e campetto sotto ---- */
+let studioOn = false, studioFs = false;
+let studioPref = {pause:true, back:false, side:false, split:{stack:52, side:60}};
+let modalVideoT = null, modalResume = false;
+const STUDIO_KEY = 'txg_studio';
+function studioLoadPref(){
   try{
-    if(document.fullscreenElement){ document.exitFullscreen(); }
-    else if(st.requestFullscreen){ st.requestFullscreen(); }
-    else if(st.webkitRequestFullscreen){ st.webkitRequestFullscreen(); }
+    const o = JSON.parse(localStorage.getItem(STUDIO_KEY) || 'null');
+    if(o){ studioPref = Object.assign(studioPref, o); studioPref.split = Object.assign({stack:52, side:60}, o.split || {}); }
   }catch(e){}
 }
+function studioSavePref(){ try{ localStorage.setItem(STUDIO_KEY, JSON.stringify(studioPref)); }catch(e){} }
+function studioApplySplit(){
+  const v = studioPref.side ? studioPref.split.side : studioPref.split.stack;
+  const r = document.documentElement.style;
+  r.setProperty('--st-v', v + '%'); r.setProperty('--st-vf', v + 'fr'); r.setProperty('--st-wf', (100 - v) + 'fr');
+  const sl = document.getElementById('stSplit'); if(sl) sl.value = v;
+}
+function studioRenderBar(){
+  document.body.classList.toggle('studio-side', !!studioPref.side);
+  const a = document.getElementById('stPause'), b = document.getElementById('stBack'), m = document.getElementById('stMode');
+  if(a) a.checked = !!studioPref.pause;
+  if(b) b.checked = !!studioPref.back;
+  if(m) m.textContent = studioPref.side ? 'Sopra / sotto' : 'Affianca';
+}
+function studioPrefChanged(){
+  studioPref.pause = document.getElementById('stPause').checked;
+  studioPref.back = document.getElementById('stBack').checked;
+  studioSavePref();
+}
+function studioToggleMode(){ studioPref.side = !studioPref.side; studioSavePref(); studioRenderBar(); studioApplySplit(); }
+function studioSetSplit(v){ studioPref.split[studioPref.side ? 'side' : 'stack'] = parseInt(v, 10) || 52; studioSavePref(); studioApplySplit(); }
+function studioFit(){
+  const v = videoEl(), slot = document.getElementById('vcSlot');
+  if(v && slot && v.videoWidth && v.videoHeight) slot.style.setProperty('--vr', (v.videoWidth / v.videoHeight).toFixed(4));
+}
+function videoFullscreen(){ if(studioOn) studioExit(); else studioEnter(); }
+function studioEnter(){
+  if(!videoLoaded()){ showAlert('Carica prima il video della partita (mp4) per usare la modalità studio.'); return; }
+  studioOn = true;
+  document.body.classList.add('studio-on');
+  studioRenderBar(); studioApplySplit(); studioFit();
+  try{
+    const el = document.documentElement;
+    if(el.requestFullscreen){ const pr = el.requestFullscreen(); if(pr && pr.then) pr.then(function(){ studioFs = true; }).catch(function(){}); }
+    else if(el.webkitRequestFullscreen){ el.webkitRequestFullscreen(); studioFs = true; }
+  }catch(e){}
+}
+function studioExit(fromFsEvent){
+  studioOn = false; studioFs = false;
+  document.body.classList.remove('studio-on');
+  try{
+    if(!fromFsEvent && (document.fullscreenElement || document.webkitFullscreenElement)){
+      if(document.exitFullscreen) document.exitFullscreen(); else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+  }catch(e){}
+}
+function studioFsChange(){
+  const fs = document.fullscreenElement || document.webkitFullscreenElement;
+  if(fs){ studioFs = true; return; }
+  if(studioOn && studioFs) studioExit(true);
+}
+function studioKey(e){
+  if(!studioOn) return;
+  const t = e.target, tag = t && t.tagName;
+  if(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || (t && t.isContentEditable)) { if(!(tag === 'INPUT' && t.type === 'checkbox') && !(tag === 'INPUT' && t.type === 'range')) return; }
+  if(document.querySelector('.modal-back.open')) return;
+  const k = e.key;
+  if(k === ' ' || k === 'Spacebar'){ e.preventDefault(); videoTogglePlay(); }
+  else if(k === 'ArrowLeft'){ e.preventDefault(); videoSeekBy(-5); }
+  else if(k === 'ArrowRight'){ e.preventDefault(); videoSeekBy(5); }
+  else if(k === 'z' || k === 'Z'){ if(typeof lastSavedShotId !== 'undefined' && lastSavedShotId != null){ e.preventDefault(); undoLastShot(); } }
+  else if(k === 'Escape' && !studioFs){ studioExit(); }
+}
+/* pausa del video quando si apre la scheda tiro, ripresa alla chiusura */
+function studioModalOpened(){
+  modalVideoT = null; modalResume = false;
+  if(!videoLoaded()) return;
+  const v = videoEl();
+  modalVideoT = v.currentTime;
+  if(studioPref.pause && !v.paused){ v.pause(); modalResume = true; }
+}
+function studioModalClosed(){
+  if(!modalResume) return;
+  modalResume = false;
+  const v = videoEl(); if(!v) return;
+  if(studioPref.back) v.currentTime = Math.max(0, v.currentTime - 5);
+  const p = v.play(); if(p && p.catch) p.catch(function(){});
+}
+function videoJumpToShot(id){
+  const sh = state.shots.find(function(x){ return x.id === id; });
+  if(!sh || sh.vt == null) return;
+  if(!videoLoaded()){ showAlert('Carica il video della partita (scheda Home) per rivedere questo tiro.'); return; }
+  const btn = document.querySelector('.tab-btn[data-tab="live"]'); if(btn) btn.click();
+  const v = videoEl();
+  v.currentTime = Math.max(0, sh.vt - 5);
+  videoTick();
+  const p = v.play(); if(p && p.catch) p.catch(function(){});
+}
+studioLoadPref();
+document.addEventListener('fullscreenchange', studioFsChange);
+document.addEventListener('webkitfullscreenchange', studioFsChange);
+document.addEventListener('keydown', studioKey);
+document.addEventListener('loadedmetadata', function(e){ if(e.target && e.target.id === 'matchVideo') studioFit(); }, true);
 function videoMode(){ return videoLoaded() && ensureVideoState().h1Start != null; }
 function videoDerived(){
   const vs = ensureVideoState(), v = videoEl(), t = v.currentTime, half = ensureClock().halfLen * 60;
@@ -3550,26 +3726,6 @@ function videoTick(){
   } else if(c.videoDriven){
     c.videoDriven = false; c.running = false; renderClockControls();
   }
-}
-function updateVideoOverlay(){
-  if(!document.getElementById('vbNameN')) return;
-  const bug = document.getElementById('vBug');
-  if(!bug) return;
-  bug.style.setProperty('--sg-cn', state.colorN || '#2563eb');
-  bug.style.setProperty('--sg-ca', state.colorA || '#ea580c');
-  ['N', 'A'].forEach(function(k){
-    document.getElementById('vbName' + k).textContent = document.getElementById('sgName' + k).textContent;
-    document.getElementById('vbScore' + k).textContent = document.getElementById('sgScore' + k).textContent;
-    const src = document.getElementById('sgLogo' + k);
-    const img = document.getElementById('vbLogo' + k), badge = document.getElementById('vbBadge' + k);
-    if(src.style.display !== 'none' && src.getAttribute('src')){
-      if(img.getAttribute('src') !== src.getAttribute('src')) img.src = src.getAttribute('src');
-      img.style.display = ''; badge.style.display = 'none';
-    } else {
-      const sb = document.getElementById('sgBadge' + k);
-      img.style.display = 'none'; badge.style.display = ''; badge.textContent = sb.textContent; badge.style.background = sb.style.background;
-    }
-  });
 }
 (function initVideoUi(){
   window.addEventListener('load', function(){
@@ -3704,25 +3860,37 @@ function updateClockDisplay(){
   if(ph.textContent !== txt) ph.textContent = txt;
   if(ph.className !== cls) ph.className = cls;
 }
+function teamAbbr(k){
+  const custom = ((k === 'N' ? state.abbrN : state.abbrA) || '').trim();
+  if(custom) return custom.toUpperCase().slice(0, 4);
+  const nm = ((k === 'N' ? state.teamN : state.teamA) || '').replace(/[^A-Za-zÀ-ÿ0-9 ]/g, '').trim();
+  return (nm.split(/\s+/)[0] || '').slice(0, 3).toUpperCase() || '—';
+}
 function updateScorebug(){
   if(typeof state === 'undefined' || !state || !document.getElementById('sgNameN')) return;
-  const bug = document.getElementById('scorebug');
-  bug.style.setProperty('--sg-cn', state.colorN || '#2563eb');
-  bug.style.setProperty('--sg-ca', state.colorA || '#ea580c');
-  document.getElementById('sgNameN').textContent = state.teamN;
-  document.getElementById('sgNameA').textContent = state.teamA;
   const golN = (state.counters.gol_live && state.counters.gol_live.n) || 0;
   const golA = (state.counters.gol_live && state.counters.gol_live.a) || 0;
-  document.getElementById('sgScoreN').textContent = golN;
-  document.getElementById('sgScoreA').textContent = golA;
-  [['N', (typeof myTeam !== 'undefined' && myTeam) ? myTeam.logo : '', state.teamN, state.colorN],
-   ['A', state.logoA, state.teamA, state.colorA]].forEach(function(t){
-    const img = document.getElementById('sgLogo' + t[0]);
-    const badge = document.getElementById('sgBadge' + t[0]);
-    if(t[1]){ if(img.getAttribute('src') !== t[1]) img.src = t[1]; img.style.display = ''; badge.style.display = 'none'; }
-    else { img.style.display = 'none'; badge.style.display = ''; badge.textContent = (t[2] || '?').trim().charAt(0).toUpperCase(); badge.style.background = t[3] || '#334155'; }
+  ['scorebug', 'vBug'].forEach(function(id){
+    const el = document.getElementById(id); if(!el) return;
+    el.style.setProperty('--sg-cn', state.colorN || '#2563eb');
+    el.style.setProperty('--sg-ca', state.colorA || '#ea580c');
   });
+  [['sg'], ['vb']].forEach(function(pr){
+    const p = pr[0];
+    const nN = document.getElementById(p + 'NameN'); if(!nN) return;
+    nN.textContent = teamAbbr('N');
+    document.getElementById(p + 'NameA').textContent = teamAbbr('A');
+    document.getElementById(p + 'ScoreN').textContent = golN;
+    document.getElementById(p + 'ScoreA').textContent = golA;
+  });
+  const bl = document.querySelector('img.brand-logo');
+  const src = bl ? bl.getAttribute('src') : '';
+  document.querySelectorAll('img.tb-brand').forEach(function(img){ if(src && img.getAttribute('src') !== src) img.setAttribute('src', src); });
+  const ia = document.getElementById('abbrN'), ib = document.getElementById('abbrA');
+  if(ia){ ia.placeholder = teamAbbr('N'); if(document.activeElement !== ia) ia.value = (state.abbrN || '').toUpperCase(); }
+  if(ib){ ib.placeholder = teamAbbr('A'); if(document.activeElement !== ib) ib.value = (state.abbrA || '').toUpperCase(); }
 }
+function updateVideoOverlay(){ updateScorebug(); }
 setInterval(function(){ if(!document.hidden) updateClockDisplay(); }, 250);
 
 function renderScoreboard(){
@@ -3864,6 +4032,7 @@ function renderShotTable(){
       <td><span class="tag out-${s.outcome}">${OUTCOME_LABEL[s.outcome]}</span></td>
       <td class="num"><span class="xgnum">${s.xg.toFixed(2)}</span></td>
       <td class="shot-actions">
+        ${s.vt != null ? `<button class="mini-icon-btn" onclick="videoJumpToShot(${JSON.stringify(s.id)})" title="Rivedi nel video caricato (5s prima)">▶</button>` : ''}
         ${s.videoUrl ? `<button class="mini-icon-btn video-has" onclick="openShotVideoById(${JSON.stringify(s.id)})" title="Guarda il video">🎥</button>` : ''}
         <button class="mini-icon-btn" onclick="editShotVideoUrl(${JSON.stringify(s.id)})" title="${s.videoUrl?'Modifica link video':'Aggiungi link video'}">${s.videoUrl?'✏️':'🎥'}</button>
         <button class="del" onclick="removeShot(${JSON.stringify(s.id)})">✕</button>
@@ -4828,7 +4997,7 @@ async function exportFullReportPDFForMatch(matchId){
     if(!isSame){ state = prevState; renderReport(); }
   }
 }
-async function saveFileViaDownloads(filename, data){
+async function saveFileViaDownloadsRaw(filename, data){
   try{
     // Dentro Claude: salvataggio tramite l'API "downloads". Fuori (app installata/PWA): download del browser.
     if(typeof claude !== 'undefined' && claude.use){
@@ -4853,6 +5022,23 @@ async function saveFileViaDownloads(filename, data){
     showAlert('Esportazione non riuscita. Riprova.');
   }
 }
+let _bkPromptAt = 0;
+async function saveFileViaDownloads(filename, data){
+  const ok = await saveFileViaDownloadsRaw(filename, data);
+  if(ok === true && !/^TacticalXG_backup/i.test(filename) && Date.now() - _bkPromptAt > 15000){
+    _bkPromptAt = Date.now();
+    offerBackupAfterExport();
+  }
+  return ok;
+}
+async function offerBackupAfterExport(){
+  try{
+    if(typeof dialogResolver !== 'undefined' && dialogResolver) return;
+    const yes = await showConfirm('Esportazione completata. Vuoi fare anche il backup di tutti i dati? Salvalo nella cartella giusta e sostituisci quello vecchio (stesso nome: TacticalXG_backup.json).',
+      {title:'Backup', okLabel:'Fai il backup', cancelLabel:'Non ora'});
+    if(yes) await exportFullBackup();
+  }catch(e){}
+}
 async function resetAll(){
   const ok = await showConfirm('Azzerare tutti i dati registrati?', {danger:true, okLabel:'Azzera'});
   if(!ok) return;
@@ -4863,6 +5049,8 @@ async function resetAll(){
 }
 
 /* ---------------- TEAM NAME & COLOR INPUTS ---------------- */
+document.getElementById('abbrN').addEventListener('input', e=>{ state.abbrN = e.target.value.toUpperCase().slice(0,4); saveState(); updateScorebug(); });
+document.getElementById('abbrA').addEventListener('input', e=>{ state.abbrA = e.target.value.toUpperCase().slice(0,4); saveState(); updateScorebug(); });
 document.getElementById('teamN').addEventListener('input', e=>{ state.teamN = e.target.value; saveState(); renderAll(); });
 document.getElementById('teamA').addEventListener('input', e=>{ state.teamA = e.target.value; saveState(); renderAll(); });
 document.getElementById('teamN').addEventListener('blur', e=>{ if(!e.target.value.trim()){ state.teamN='Nostra'; saveState(); renderAll(); } });
