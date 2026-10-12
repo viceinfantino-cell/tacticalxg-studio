@@ -395,6 +395,11 @@ body.studio-on #modalBack .modal{max-height:100%;}
   body.studio-on.studio-side #modalBack{left:0;}
   body.studio-on.studio-side #modalBack{top:calc(var(--st-v,52%) + 46px);}
 }
+/* esportazione clip dei tiri */
+.clip-bar{height:10px;border-radius:6px;background:var(--border);overflow:hidden;margin:10px 0 6px;}
+.clip-bar i{display:block;height:100%;width:0;background:var(--blue);transition:width .2s;}
+.clip-row{display:flex;gap:10px;} .clip-row .field{flex:1;}
+.clip-info{font-size:12.5px;color:var(--text-soft);line-height:1.5;margin:4px 0 12px;}
 /* tastierino "Vai al minuto" */
 .gm-display{font-size:40px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.04em;
   background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:8px 10px;margin:4px 0 10px;min-height:62px;}
@@ -416,7 +421,7 @@ body.studio-on #modalBack .modal{max-height:100%;}
 .tb-left{display:flex;flex-direction:column;width:5.4em;}
 .tb-top{background:#fff;height:3.3em;display:flex;align-items:center;justify-content:center;padding:.2em .3em;}
 .tb-brand{max-width:100%;max-height:100%;object-fit:contain;display:block;}
-.tb-time{background:#14226b;color:#fff;height:2.3em;display:flex;align-items:center;justify-content:center;gap:.3em;
+.tb-time{white-space:nowrap;background:#14226b;color:#fff;height:2.3em;display:flex;align-items:center;justify-content:center;gap:.3em;
   font-weight:900;font-size:1.15em;font-variant-numeric:tabular-nums;letter-spacing:.02em;}
 .tb-time small, .tb-extra{font-size:.62em;color:#fbbf24;font-weight:800;}
 .tb-mid{background:#1c1c1e;color:#fff;display:grid;grid-template-rows:1fr 1fr;min-width:4.6em;}
@@ -1571,7 +1576,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       </div>
       <div class="field" style="flex:1">
         <label>Tempo (auto dal minuto)</label>
-        <div id="modalTempoLabel" style="padding:9px 4px;font-weight:700">1° tempo</div>
+        <div id="modalTempoLabel" onclick="toggleModalTempo()" title="Tocca per cambiare tempo" style="padding:9px 4px;font-weight:700;cursor:pointer">1° tempo</div>
         <select id="modalTempo" style="display:none"><option value="1">1°</option><option value="2">2°</option></select>
       </div>
     </div>
@@ -1704,6 +1709,35 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <button type="button" class="run" onclick="goMinApply(true)">Vai e avvia</button>
     </div>
     <button type="button" class="gm-cancel" onclick="goMinClose()">Annulla</button>
+  </div>
+</div>
+
+<div class="modal-back" id="clipBack">
+  <div class="modal" style="max-width:440px">
+    <h3>Esporta clip dei tiri (video)</h3>
+    <div id="clipForm">
+      <div class="clip-row">
+        <div class="field"><label>Squadra</label>
+          <select id="clipTeam" onchange="clipUpdateInfo()"><option value="all">Entrambe</option><option value="n">Solo nostra</option><option value="a">Solo avversaria</option></select></div>
+        <div class="field"><label>Quali tiri</label>
+          <select id="clipOutcome" onchange="clipUpdateInfo()"><option value="all">Tutti i tiri</option><option value="gol">Solo gol</option><option value="gp">Gol e parate</option><option value="occ">Occasioni da gol</option></select></div>
+      </div>
+      <div class="clip-row">
+        <div class="field"><label>Secondi prima</label><input type="number" id="clipPre" value="8" min="2" max="40" oninput="clipUpdateInfo()"></div>
+        <div class="field"><label>Secondi dopo</label><input type="number" id="clipPost" value="6" min="2" max="40" oninput="clipUpdateInfo()"></div>
+      </div>
+      <div class="clip-info" id="clipInfo"></div>
+      <div class="gm-go">
+        <button type="button" class="hold" onclick="clipClose()">Chiudi</button>
+        <button type="button" class="run" id="clipGoBtn" onclick="clipStart()">Crea il video</button>
+      </div>
+    </div>
+    <div id="clipProg" style="display:none">
+      <div class="clip-info" id="clipProgText">Preparazione…</div>
+      <div class="clip-bar"><i id="clipProgBar"></i></div>
+      <div class="clip-info">Lascia questa scheda aperta e in primo piano: il video viene registrato in tempo reale.</div>
+      <button type="button" class="gm-cancel" onclick="clipAbort()">Annulla esportazione</button>
+    </div>
   </div>
 </div>
 
@@ -2984,6 +3018,7 @@ function openModal(zone){
   modalClockMin = ck ? String(ck.min) : null; modalClockTempo = ck ? ck.tempo : '1';
   document.getElementById('modalMin').value = ck ? String(ck.min) : '';
   document.getElementById('modalTempo').value='1';
+  modalTempoManual = null; _tmMinSeen = null;
   syncModalTempo();
   document.getElementById('modalOutcome').value='gol';
   document.getElementById('modalActionType').value='manovrata';
@@ -3065,17 +3100,30 @@ function tempoFromMin(min, fallback){
   if(isNaN(m)) return fallback || '1';
   return m >= secondHalfFromMin() ? '2' : '1';
 }
+let modalTempoManual = null, _tmMinSeen = null;
+function toggleModalTempo(){
+  modalTempoManual = document.getElementById('modalTempo').value === '1' ? '2' : '1';
+  syncModalTempo();
+}
 function syncModalTempo(){
   const v = document.getElementById('modalMin').value;
-  const t = (modalClockMin !== null && v === modalClockMin) ? modalClockTempo : tempoFromMin(v, '1');
+  if(_tmMinSeen !== null && v !== _tmMinSeen) modalTempoManual = null;   // se cambi il minuto, il tempo torna automatico
+  _tmMinSeen = v;
+  const t = modalTempoManual || ((modalClockMin !== null && v === modalClockMin) ? modalClockTempo : tempoFromMin(v, '1'));
   document.getElementById('modalTempo').value = t;
-  document.getElementById('modalTempoLabel').textContent = t + '° tempo';
+  const half = (ensureClock().halfLen || 45), m = parseInt(v, 10);
+  let hint = '';
+  if(!isNaN(m)){
+    if(t === '1' && m > half) hint = ' · rec. ' + half + '+' + (m - half);
+    else if(t === '2' && m > half * 2) hint = ' · rec. ' + (half * 2) + '+' + (m - half * 2);
+  }
+  document.getElementById('modalTempoLabel').innerHTML = t + '° tempo' + hint + ' <span style="font-weight:600;font-size:11px;color:var(--text-soft)">(tocca per cambiare)</span>';
 }
 function saveShot(){
   if(!pendingShot) return;
   const player = currentPlayerName();
   const min = document.getElementById('modalMin').value || '';
-  const tempo = (modalClockMin !== null && min === modalClockMin) ? modalClockTempo : tempoFromMin(min, document.getElementById('modalTempo').value);
+  const tempo = modalTempoManual || ((modalClockMin !== null && min === modalClockMin) ? modalClockTempo : tempoFromMin(min, document.getElementById('modalTempo').value));
   const outcome = document.getElementById('modalOutcome').value;
   const actionType = document.getElementById('modalActionType').value;
   const zone = pendingShot.zone;
@@ -3429,6 +3477,11 @@ function clockCapSec(){
   return c.halfLen * 60 * ((c.phase === 'h2' || c.phase === 'end') ? 2 : 1);
 }
 function clockPad(n){ return (n < 10 ? '0' : '') + n; }
+// Oltre il tempo regolamentare si mostra solo il recupero in minuti, come in TV: 45+1, 45+2, 90+3 (niente secondi).
+function clockLabel(sec, cap, capped){
+  if(capped && sec > cap) return clockPad(Math.floor(cap / 60)) + '+' + (Math.floor((sec - cap) / 60) + 1);
+  return clockPad(Math.floor(sec / 60)) + ':' + clockPad(Math.floor(sec % 60));
+}
 function clockMinuteNow(){ return Math.floor(clockSec() / 60) + 1; }
 // info per un nuovo tiro/nota: minuto e tempo dal cronometro (solo se la partita è in corso)
 function clockShotInfo(){
@@ -3570,7 +3623,7 @@ function renderVideoCard(){
           b('Fine 1° tempo' + ok(vs.h1End), "videoMark('h1End')") +
           b('Inizio 2° tempo' + ok(vs.h2Start), "videoMark('h2Start')", (vs.h1Start != null && vs.h2Start == null) ? 'vc-primary' : '') +
           b('Vai al minuto', 'goMinOpen()', vs.h1Start != null ? 'vc-primary' : '') +
-          b('Play/Pausa', 'videoTogglePlay()') + b('−10s', 'videoSeekBy(-10)') + b('+10s', 'videoSeekBy(10)') +
+          b('Play/Pausa', 'videoTogglePlay()') + b('Esporta clip tiri', 'clipOpen()') + b('−10s', 'videoSeekBy(-10)') + b('+10s', 'videoSeekBy(10)') +
           '<select id="vcRate" onchange="videoSetRate(this.value)">' +
           [0.5, 1, 1.5, 2].map(function(r){ return '<option value="' + r + '"' + (r === rate ? ' selected' : '') + '>' + r + '×</option>'; }).join('') + '</select>' +
           b('Azzera sync', 'videoClearSync()');
@@ -3705,6 +3758,237 @@ document.addEventListener('fullscreenchange', studioFsChange);
 document.addEventListener('webkitfullscreenchange', studioFsChange);
 document.addEventListener('keydown', studioKey);
 document.addEventListener('loadedmetadata', function(e){ if(e.target && e.target.id === 'matchVideo') studioFit(); }, true);
+/* ---- Esporta i tiri come video: taglia le azioni dal video caricato e le registra in un unico file ---- */
+let clipBusy = false, clipCancel = false;
+function clipFiltered(){
+  const team = document.getElementById('clipTeam').value, oc = document.getElementById('clipOutcome').value;
+  const all = state.shots.filter(function(sh){
+    if(team !== 'all' && sh.team !== team) return false;
+    if(oc === 'gol') return sh.outcome === 'gol';
+    if(oc === 'gp') return sh.outcome === 'gol' || sh.outcome === 'parato';
+    if(oc === 'occ') return sh.xg >= OCCASIONE_XG_THRESHOLD;
+    return true;
+  });
+  return {withVt: all.filter(function(sh){ return sh.vt != null; }).sort(function(a, b){ return a.vt - b.vt; }), missing: all.filter(function(sh){ return sh.vt == null; }).length};
+}
+function clipSegments(shots, pre, post){
+  const segs = [];
+  shots.forEach(function(sh){
+    const a = Math.max(0, sh.vt - pre), b = sh.vt + post;
+    const last = segs[segs.length - 1];
+    if(last && a <= last.end + 0.5){ last.end = Math.max(last.end, b); last.shots.push(sh); }
+    else segs.push({start: a, end: b, shots: [sh]});
+  });
+  const v = videoEl();
+  if(v && isFinite(v.duration)) segs.forEach(function(g){ g.end = Math.min(g.end, v.duration); });
+  return segs;
+}
+function clipParams(){
+  const pre = Math.max(2, Math.min(40, parseFloat(document.getElementById('clipPre').value) || 8));
+  const post = Math.max(2, Math.min(40, parseFloat(document.getElementById('clipPost').value) || 6));
+  return {pre: pre, post: post};
+}
+function clipUpdateInfo(){
+  const f = clipFiltered(), pr = clipParams();
+  const segs = clipSegments(f.withVt, pr.pre, pr.post);
+  const tot = segs.reduce(function(a, g){ return a + (g.end - g.start); }, 0);
+  let t = f.withVt.length + ' tiri con il momento nel video → ' + segs.length + ' clip, circa ' + Math.floor(tot / 60) + ' min ' + Math.round(tot % 60) + ' s di video.';
+  if(f.missing) t += ' ' + f.missing + ' tiri senza momento nel video (registrati senza video caricato) restano fuori.';
+  if(!f.withVt.length) t = 'Nessun tiro con il momento nel video: carica il video e segna i tiri mentre lo guardi.';
+  t += ' Il file si crea in tempo reale: ci vuole quanto dura.';
+  document.getElementById('clipInfo').textContent = t;
+  document.getElementById('clipGoBtn').disabled = !f.withVt.length;
+}
+function clipOpen(){
+  if(!videoLoaded()){ showAlert('Carica prima il video della partita (mp4).'); return; }
+  document.getElementById('clipForm').style.display = '';
+  document.getElementById('clipProg').style.display = 'none';
+  clipUpdateInfo();
+  document.getElementById('clipBack').classList.add('open');
+}
+function clipClose(){ if(clipBusy) return; document.getElementById('clipBack').classList.remove('open'); }
+function clipAbort(){ clipCancel = true; }
+function clipMime(){
+  if(typeof MediaRecorder === 'undefined') return '';
+  const c = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+  for(let i = 0; i < c.length; i++){ try{ if(MediaRecorder.isTypeSupported(c[i])) return c[i]; }catch(e){} }
+  return '';
+}
+function clipRoundRect(ctx, x, y, w, h, r){
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function clipTimeText(t){
+  const vs = ensureVideoState(), half = ensureClock().halfLen * 60;
+  if(vs.h1Start == null || t < vs.h1Start) return '--:--';
+  let sec, cap;
+  if(vs.h2Start != null && t >= vs.h2Start){ sec = half + (t - vs.h2Start); cap = half * 2; }
+  else { sec = t - vs.h1Start; cap = half; if(vs.h1End != null && t >= vs.h1End) sec = vs.h1End - vs.h1Start; }
+  return clockLabel(sec, cap, true);
+}
+function clipScoreAt(t, cur){
+  const key = function(sh){ return (String(sh.tempo) === '2' ? 1000 : 0) + (parseFloat(sh.min) || 0); };
+  let n = 0, a = 0;
+  state.shots.forEach(function(sh){
+    if(sh.outcome !== 'gol') return;
+    const before = (sh.vt != null) ? (sh.vt <= t + 0.4) : (key(sh) <= key(cur));
+    if(before){ if(sh.team === 'n') n++; else a++; }
+  });
+  return [n, a];
+}
+function clipDrawBug(ctx, u, x, y, timeTxt, score){
+  const brand = document.querySelector('img.brand-logo');
+  const wL = 5.4 * u, hT = 3.3 * u, hB = 2.3 * u, H = hT + hB;
+  ctx.font = '900 ' + (1.2 * u) + 'px Helvetica, Arial, sans-serif';
+  const sN = teamAbbr('N'), sA = teamAbbr('A');
+  const wM = Math.max(4.6 * u, Math.max(ctx.measureText(sN).width, ctx.measureText(sA).width) + 1.6 * u), wS = 3.1 * u;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 0.8 * u; ctx.shadowOffsetY = 0.3 * u;
+  clipRoundRect(ctx, x, y, wL + wM + wS, H, 0.3 * u); ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.restore(); ctx.save();
+  clipRoundRect(ctx, x, y, wL + wM + wS, H, 0.3 * u); ctx.clip();
+  ctx.fillStyle = '#fff'; ctx.fillRect(x, y, wL, hT);
+  if(brand && brand.complete && brand.naturalWidth){
+    const bw = wL - 0.6 * u, bh = hT - 0.4 * u, k = Math.min(bw / brand.naturalWidth, bh / brand.naturalHeight);
+    const dw = brand.naturalWidth * k, dh = brand.naturalHeight * k;
+    ctx.drawImage(brand, x + (wL - dw) / 2, y + (hT - dh) / 2, dw, dh);
+  }
+  ctx.fillStyle = '#14226b'; ctx.fillRect(x, y + hT, wL, hB);
+  ctx.fillStyle = '#fff'; ctx.font = '900 ' + (1.15 * u * 1.0) + 'px Helvetica, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(timeTxt, x + wL / 2, y + hT + hB / 2 + 0.05 * u);
+  ctx.fillStyle = '#1c1c1e'; ctx.fillRect(x + wL, y, wM, H);
+  ctx.fillStyle = '#fff'; ctx.font = '900 ' + (1.2 * u) + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(sN, x + wL + wM / 2, y + H / 4); ctx.fillText(sA, x + wL + wM / 2, y + 3 * H / 4);
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(x + wL + wM, y, wS, H);
+  ctx.fillStyle = state.colorN || '#2563eb'; ctx.fillRect(x + wL + wM, y, 0.32 * u, H / 2);
+  ctx.fillStyle = state.colorA || '#ea580c'; ctx.fillRect(x + wL + wM, y + H / 2, 0.32 * u, H / 2);
+  ctx.fillStyle = '#c7c7c7'; ctx.fillRect(x + wL + wM + 0.32 * u, y + H / 2 - 0.5, wS - 0.32 * u, 1);
+  ctx.fillStyle = '#111'; ctx.font = '900 ' + (1.65 * u) + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(String(score[0]), x + wL + wM + wS / 2 + 0.16 * u, y + H / 4); ctx.fillText(String(score[1]), x + wL + wM + wS / 2 + 0.16 * u, y + 3 * H / 4);
+  ctx.restore();
+}
+function clipDrawFrame(ctx, W, H, v, seg, idx, total, tIdx){
+  const u = W / 1280 * 18, t = v.currentTime;
+  ctx.drawImage(v, 0, 0, W, H);
+  // il tiro di riferimento: il primo non ancora concluso (vt + 2s), altrimenti l'ultimo
+  let cur = seg.shots[seg.shots.length - 1];
+  for(let i = 0; i < seg.shots.length; i++){ if(seg.shots[i].vt + 2 >= t){ cur = seg.shots[i]; break; } }
+  clipDrawBug(ctx, u, 0.9 * u, 0.9 * u, clipTimeText(t), clipScoreAt(t, cur));
+  // didascalia in basso
+  const bh = 3.2 * u;
+  const g = ctx.createLinearGradient(0, H - bh * 1.4, 0, H); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.78)');
+  ctx.fillStyle = g; ctx.fillRect(0, H - bh * 1.4, W, bh * 1.4);
+  const nm = cur.team === 'n' ? state.teamN : state.teamA, col = cur.team === 'n' ? (state.colorN || '#2563eb') : (state.colorA || '#ea580c');
+  ctx.fillStyle = col; ctx.fillRect(0.9 * u, H - bh + 0.1 * u, 0.4 * u, 1.9 * u);
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+  ctx.font = '900 ' + (1.25 * u) + 'px Helvetica, Arial, sans-serif';
+  const parts = [nm]; if(cur.player) parts.push(cur.player);
+  ctx.fillText(parts.join(' · '), 1.7 * u, H - bh + 0.55 * u);
+  ctx.font = '700 ' + (1.0 * u) + 'px Helvetica, Arial, sans-serif'; ctx.fillStyle = '#e5e7eb';
+  const det = [OUTCOME_LABEL[cur.outcome] || '', (cur.min !== '' && cur.min != null ? cur.min + "'" : ''), 'xG ' + (cur.xg || 0).toFixed(2), cur.zone].filter(Boolean).join('  ·  ');
+  ctx.fillText(det, 1.7 * u, H - bh + 1.75 * u);
+  ctx.textAlign = 'right'; ctx.fillStyle = '#cbd5e1';
+  ctx.fillText('Clip ' + (tIdx + 1) + '/' + total, W - 0.9 * u, H - bh + 1.1 * u);
+}
+function clipDrawTitle(ctx, W, H, n){
+  const brand = document.querySelector('img.brand-logo');
+  ctx.fillStyle = '#0b0f1a'; ctx.fillRect(0, 0, W, H);
+  if(brand && brand.complete && brand.naturalWidth){ const s = H * 0.42; ctx.drawImage(brand, W / 2 - s / 2, H * 0.14, s, s); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+  ctx.font = '900 ' + (H * 0.07) + 'px Helvetica, Arial, sans-serif';
+  ctx.fillText(state.teamN + '  vs  ' + state.teamA, W / 2, H * 0.68);
+  ctx.font = '700 ' + (H * 0.042) + 'px Helvetica, Arial, sans-serif'; ctx.fillStyle = '#9ca3af';
+  ctx.fillText('Analisi dei tiri · ' + n + ' azioni', W / 2, H * 0.78);
+}
+function clipSleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function clipSeek(v, t){
+  return new Promise(function(res){
+    let done = false;
+    const fin = function(){ if(done) return; done = true; v.removeEventListener('seeked', fin); res(); };
+    v.addEventListener('seeked', fin); v.currentTime = t; setTimeout(fin, 3000);
+  });
+}
+function clipAudioOn(){
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return null;
+    if(!window._clipAud){ const ac = new AC(); window._clipAud = {ac: ac, src: ac.createMediaElementSource(videoEl())}; }
+    const a = window._clipAud; if(a.ac.resume) a.ac.resume();
+    a.dest = a.ac.createMediaStreamDestination();
+    a.src.disconnect(); a.src.connect(a.dest);
+    return a;
+  }catch(e){ return null; }
+}
+function clipAudioOff(){
+  const a = window._clipAud; if(!a) return;
+  try{ a.src.disconnect(); a.src.connect(a.ac.destination); }catch(e){}
+}
+async function clipStart(){
+  if(clipBusy) return;
+  const f = clipFiltered(), pr = clipParams();
+  const segs = clipSegments(f.withVt, pr.pre, pr.post);
+  if(!segs.length) return;
+  const v = videoEl();
+  const mime = clipMime();
+  if(!mime || !HTMLCanvasElement.prototype.captureStream){
+    showAlert('Questo browser non può creare il video. Prova con Safari o Chrome aggiornati sul Mac.');
+    return;
+  }
+  clipBusy = true; clipCancel = false;
+  document.getElementById('clipForm').style.display = 'none';
+  document.getElementById('clipProg').style.display = '';
+  const txt = document.getElementById('clipProgText'), bar = document.getElementById('clipProgBar');
+  const vw = v.videoWidth || 1280, vh = v.videoHeight || 720;
+  const W = Math.min(1280, vw) & ~1, H = Math.round(W * vh / vw) & ~1;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  const prev = {t: v.currentTime, paused: v.paused, rate: v.playbackRate};
+  v.pause(); v.playbackRate = 1;
+  const stream = cv.captureStream(30);
+  const aud = clipAudioOn();
+  if(aud) aud.dest.stream.getAudioTracks().forEach(function(tr){ stream.addTrack(tr); });
+  let rec;
+  try{ rec = new MediaRecorder(stream, {mimeType: mime, videoBitsPerSecond: 5000000}); }
+  catch(e){ rec = new MediaRecorder(stream); }
+  const chunks = [];
+  rec.ondataavailable = function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+  const stopped = new Promise(function(res){ rec.onstop = res; });
+  const totalDur = 2.5 + segs.reduce(function(a, g){ return a + (g.end - g.start); }, 0);
+  let doneDur = 0;
+  const setProg = function(label){ txt.textContent = label; bar.style.width = Math.min(100, Math.round(doneDur / totalDur * 100)) + '%'; };
+  try{
+    rec.start(1000);
+    setProg('Titolo…');
+    const t0 = Date.now();
+    while(Date.now() - t0 < 2500 && !clipCancel){ clipDrawTitle(ctx, W, H, f.withVt.length); doneDur = (Date.now() - t0) / 1000; await clipSleep(33); }
+    doneDur = 2.5;
+    for(let i = 0; i < segs.length && !clipCancel; i++){
+      const g = segs[i], len = g.end - g.start;
+      await clipSeek(v, g.start);
+      clipDrawFrame(ctx, W, H, v, g, i, segs.length, i);
+      const pr0 = v.play(); if(pr0 && pr0.catch) pr0.catch(function(){});
+      const base = doneDur;
+      while(!clipCancel && v.currentTime < g.end - 0.05 && !v.ended){
+        clipDrawFrame(ctx, W, H, v, g, i, segs.length, i);
+        doneDur = base + Math.max(0, v.currentTime - g.start);
+        setProg('Clip ' + (i + 1) + ' di ' + segs.length + ' · ' + Math.round(doneDur / totalDur * 100) + '%');
+        await clipSleep(33);
+      }
+      v.pause(); doneDur = base + len;
+    }
+    await clipSleep(250);
+  }catch(e){ console.error('Clip export failed', e); clipCancel = true; }
+  try{ rec.stop(); }catch(e){}
+  await stopped;
+  clipAudioOff();
+  try{ v.pause(); v.currentTime = prev.t; v.playbackRate = prev.rate; }catch(e){}
+  clipBusy = false;
+  document.getElementById('clipBack').classList.remove('open');
+  if(clipCancel){ return; }
+  const blob = new Blob(chunks, {type: mime.split(';')[0]});
+  const ext = /mp4/.test(mime) ? 'mp4' : 'webm';
+  const fname = ('Clip_tiri_' + teamAbbr('N') + '_vs_' + teamAbbr('A')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_-]+/g, '_') + '.' + ext;
+  await saveFileViaDownloads(fname, blob);
+}
 function videoMode(){ return videoLoaded() && ensureVideoState().h1Start != null; }
 function videoDerived(){
   const vs = ensureVideoState(), v = videoEl(), t = v.currentTime, half = ensureClock().halfLen * 60;
@@ -3840,13 +4124,9 @@ function updateClockDisplay(){
   const c = ensureClock();
   const sec = clockSec();
   const cap = clockCapSec();
-  let main = sec, extra = '';
-  if(sec > cap && (c.phase === 'h1' || c.phase === 'h2' || c.phase === 'ht' || c.phase === 'end')){
-    main = cap;
-    const ex = Math.floor(sec - cap);
-    extra = '+' + clockPad(Math.floor(ex / 60)) + ':' + clockPad(ex % 60);
-  }
-  t.textContent = clockPad(Math.floor(main / 60)) + ':' + clockPad(Math.floor(main % 60));
+  const extra = '';
+  const capped = (c.phase === 'h1' || c.phase === 'h2' || c.phase === 'ht' || c.phase === 'end');
+  t.textContent = clockLabel(sec, cap, capped);
   document.getElementById('sgExtra').textContent = extra;
   const vbT = document.getElementById('vbTime');
   if(vbT){ vbT.textContent = t.textContent; document.getElementById('vbExtra').textContent = extra; }
@@ -4392,20 +4672,28 @@ function buildCsvForState(st){
   let csv = 'Minuto;Tempo;Ruolo;Squadra;Giocatore;Zona;Azione;Esito;xG\n';
   st.shots.forEach(function(s){
     const ruolo = s.team==='n' ? 'Nostra' : 'Avversaria';
-    csv += `${s.min};${s.tempo};${ruolo};${s.team==='n'?st.teamN:st.teamA};${s.player};${s.zone};${ACTION_TYPES[s.actionType]||''};${OUTCOME_LABEL[s.outcome]};${s.xg.toFixed(2).replace('.', ',')}\n`;
+    csv += `${s.min};${s.tempo};${ruolo};${csvField(s.team==='n'?st.teamN:st.teamA)};${csvField(s.player)};${s.zone};${ACTION_TYPES[s.actionType]||''};${OUTCOME_LABEL[s.outcome]};${s.xg.toFixed(2).replace('.', ',')}\n`;
   });
   return csv;
+}
+function csvField(v){
+  const t = String(v == null ? '' : v);
+  return /[;"\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+}
+function exportErrDetail(e){
+  const m = e && (e.message || e.name) ? String(e.message || e.name) : (e ? String(e) : '');
+  return m ? ' (' + m.slice(0, 80) + ')' : '';
 }
 function sanitizeFilename(name){
   return (name||'file').replace(/[\/\\:*?"<>|]+/g,'_');
 }
 async function exportCSV(){
-  const blob = new Blob([buildCsvForState(state)], {type:'text/csv'});
+  const blob = new Blob(['\uFEFF', buildCsvForState(state)], {type:'text/csv;charset=utf-8'});
   await saveFileViaDownloads('match_studio_tiri.csv', blob);
 }
 async function exportCSVForMatch(matchId){
   const st = (matchId===currentMatchId) ? state : (loadMatchState(matchId) || freshState());
-  const blob = new Blob([buildCsvForState(st)], {type:'text/csv'});
+  const blob = new Blob(['\uFEFF', buildCsvForState(st)], {type:'text/csv;charset=utf-8'});
   const fname = 'tiri_'+(st.teamN||'squadra')+'_vs_'+(st.teamA||'avversaria')+'.csv';
   await saveFileViaDownloads(sanitizeFilename(fname), blob);
 }
@@ -4520,7 +4808,7 @@ async function exportTiriPDF(){
     const blob = doc.output('blob');
     await saveFileViaDownloads('match_studio_tiri.pdf', blob);
   }catch(e){
-    showAlert('Esportazione PDF non riuscita. Riprova.');
+    showAlert('Esportazione PDF non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   }
 }
 async function exportTiriPDFForMatch(matchId){
@@ -4535,7 +4823,7 @@ async function exportTiriPDFForMatch(matchId){
     const fname = 'tiri_'+(st.teamN||'squadra')+'_vs_'+(st.teamA||'avversaria')+'.pdf';
     await saveFileViaDownloads(sanitizeFilename(fname), blob);
   }catch(e){
-    showAlert('Esportazione PDF non riuscita. Riprova.');
+    showAlert('Esportazione PDF non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   }
 }
 /* ---------------- REPORT COMPLETO (PDF multi-pagina: grafica + tutte le statistiche + tutti i tiri) ----------------
@@ -4969,7 +5257,7 @@ async function exportFullReportPDF(){
     const fname = 'report_completo_'+(state.teamN||'squadra')+'_vs_'+(state.teamA||'avversaria')+'.pdf';
     await saveFileViaDownloads(sanitizeFilename(fname), blob);
   }catch(e){
-    showAlert('Esportazione PDF non riuscita. Riprova.');
+    showAlert('Esportazione PDF non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   }
 }
 async function exportFullReportPDFForMatch(matchId){
@@ -4992,7 +5280,7 @@ async function exportFullReportPDFForMatch(matchId){
     const fname = 'report_completo_'+(state.teamN||'squadra')+'_vs_'+(state.teamA||'avversaria')+'.pdf';
     await saveFileViaDownloads(sanitizeFilename(fname), blob);
   }catch(e){
-    showAlert('Esportazione PDF non riuscita. Riprova.');
+    showAlert('Esportazione PDF non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   }finally{
     if(!isSame){ state = prevState; renderReport(); }
   }
@@ -5005,21 +5293,30 @@ async function saveFileViaDownloadsRaw(filename, data){
       if(downloads){ await downloads.save({filename, data}); return true; }
     }
     const blob = (data instanceof Blob) ? data : new Blob([data]);
-    if(navigator.canShare && typeof File !== 'undefined'){
-      try{
-        const f = new File([blob], filename, {type: blob.type || 'application/octet-stream'});
-        if(navigator.canShare({files:[f]})){ await navigator.share({files:[f], title: filename}); return true; }
-      }catch(e){ if(e && e.name === 'AbortError') return false; }
+    const touch = (navigator.maxTouchPoints || 0) > 1;   // iPad/iPhone: foglio di condivisione ("Salva su File"); Mac/PC: download diretto
+    if(touch && navigator.canShare && typeof File !== 'undefined'){
+      const f = new File([blob], filename, {type: blob.type || 'application/octet-stream'});
+      if(navigator.canShare({files:[f]})){
+        try{ await navigator.share({files:[f], title: filename}); return true; }
+        catch(e){
+          if(e && e.name === 'AbortError') return false;
+          // il permesso del tocco può scadere mentre l'app prepara un file grande: chiedo un nuovo tocco
+          const go = await showConfirm('Il file "' + filename + '" è pronto. Tocca Salva per scegliere dove metterlo (es. Salva su File).', {title:'File pronto', okLabel:'Salva', cancelLabel:'Annulla'});
+          if(!go) return false;
+          try{ await navigator.share({files:[f], title: filename}); return true; }
+          catch(e2){ if(e2 && e2.name === 'AbortError') return false; }
+        }
+      }
     }
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = filename; document.body.appendChild(a); a.click();
-    setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 1500);
+    setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 4000);
     return true;
   }catch(err){
     if(err && err.code === 'declined') return false;
     console.error('Export failed', err);
-    showAlert('Esportazione non riuscita. Riprova.');
+    showAlert('Esportazione non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   }
 }
 let _bkPromptAt = 0;
@@ -5783,7 +6080,11 @@ function captureReportCardCanvas(){
   return new Promise(function(resolve,reject){
     if(!isH2CAvailable()){ reject(new Error('h2c-unavailable')); return; }
     const node = document.getElementById('reportCard');
-    html2canvas(node, {backgroundColor:null, scale:3}).then(resolve).catch(reject);
+    const w = node.scrollWidth || node.offsetWidth || 1, h = node.scrollHeight || node.offsetHeight || 1;
+    const desktop = (navigator.maxTouchPoints || 0) <= 1;          // Mac/PC: più risoluzione; iPad: limite di memoria di Safari
+    let sc = desktop ? 4 : 3; const maxPx = desktop ? 60000000 : 14000000;
+    while(sc > 1 && w * sc * h * sc > maxPx) sc -= 0.25;
+    html2canvas(node, {backgroundColor:null, scale:sc, useCORS:true, logging:false}).then(function(cv){ cv.__scale = sc; resolve(cv); }).catch(reject);
   });
 }
 function captureReportCardAsBlob(){
@@ -5802,8 +6103,9 @@ function captureReportCardAsPdfBlob(){
     if(!isPdfLibAvailable()) throw new Error('jspdf-unavailable');
     const jsPDF = window.jspdf.jsPDF;
     const imgData = canvas.toDataURL('image/png');
-    const wMm = canvas.width * 25.4 / 96 / 3;  // scale:3 in html2canvas → riporto a mm ~96dpi
-    const hMm = canvas.height * 25.4 / 96 / 3;
+    const sc = canvas.__scale || 3;
+    const wMm = canvas.width * 25.4 / 96 / sc;  // scala di html2canvas → riporto a mm ~96dpi
+    const hMm = canvas.height * 25.4 / 96 / sc;
     const doc = new jsPDF({
       orientation: wMm >= hMm ? 'landscape' : 'portrait',
       unit: 'mm',
@@ -5821,8 +6123,8 @@ function exportReportImage(){
   }
   captureReportCardAsBlob().then(function(blob){
     return saveFileViaDownloads('match_studio_report.png', blob);
-  }).catch(function(){
-    showAlert('Esportazione non riuscita. Riprova.');
+  }).catch(function(e){
+    showAlert('Esportazione non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   });
 }
 function exportReportPDF(){
@@ -5834,8 +6136,8 @@ function exportReportPDF(){
   const fname = 'report_'+(state.teamN||'squadra')+'_vs_'+(state.teamA||'avversaria')+'.pdf';
   captureReportCardAsPdfBlob().then(function(blob){
     return saveFileViaDownloads(sanitizeFilename(fname), blob);
-  }).catch(function(){
-    showAlert('Esportazione PDF non riuscita. Riprova.');
+  }).catch(function(e){
+    showAlert('Esportazione PDF non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   });
 }
 async function exportImageForMatch(matchId){
@@ -5857,7 +6159,7 @@ async function exportImageForMatch(matchId){
     const fname = 'report_'+(state.teamN||'squadra')+'_vs_'+(state.teamA||'avversaria')+'.png';
     await saveFileViaDownloads(sanitizeFilename(fname), blob);
   }catch(e){
-    showAlert('Esportazione non riuscita. Riprova.');
+    showAlert('Esportazione non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   }finally{
     if(!isSame){ state = prevState; renderReport(); }
   }
@@ -5881,7 +6183,7 @@ async function exportPDFForMatch(matchId){
     const fname = 'report_'+(state.teamN||'squadra')+'_vs_'+(state.teamA||'avversaria')+'.pdf';
     await saveFileViaDownloads(sanitizeFilename(fname), blob);
   }catch(e){
-    showAlert('Esportazione PDF non riuscita. Riprova.');
+    showAlert('Esportazione PDF non riuscita. Riprova.' + exportErrDetail(typeof e !== 'undefined' ? e : null));
   }finally{
     if(!isSame){ state = prevState; renderReport(); }
   }
@@ -6306,9 +6608,9 @@ async function exportStoricoMatchesCsv(){
   all.forEach(function(m){
     const st = m.state, s = statsForMatch(st);
     const dateStr = m.createdAt ? new Date(m.createdAt).toLocaleDateString('it-IT') : '—';
-    csv += `${dateStr};${st.teamN} vs ${st.teamA};${s.xgN.toFixed(2).replace('.', ',')};${s.xgA.toFixed(2).replace('.', ',')};${s.golN};${s.golA};${s.tiriN};${s.tiriA}\n`;
+    csv += `${dateStr};${csvField(st.teamN+' vs '+st.teamA)};${s.xgN.toFixed(2).replace('.', ',')};${s.xgA.toFixed(2).replace('.', ',')};${s.golN};${s.golA};${s.tiriN};${s.tiriA}\n`;
   });
-  const blob = new Blob([csv], {type:'text/csv'});
+  const blob = new Blob(['\uFEFF', csv], {type:'text/csv;charset=utf-8'});
   await saveFileViaDownloads('storico_partite.csv', blob);
 }
 async function exportStoricoPlayersCsv(){
@@ -6319,9 +6621,9 @@ async function exportStoricoPlayersCsv(){
   prows.forEach(function(r){
     const np = r.matches.size;
     const perMatch = np ? (r.xg/np) : 0;
-    csv += `${r.player};${np};${r.tiri};${r.gol};${r.xg.toFixed(2).replace('.', ',')};${perMatch.toFixed(2).replace('.', ',')}\n`;
+    csv += `${csvField(r.player)};${np};${r.tiri};${r.gol};${r.xg.toFixed(2).replace('.', ',')};${perMatch.toFixed(2).replace('.', ',')}\n`;
   });
-  const blob = new Blob([csv], {type:'text/csv'});
+  const blob = new Blob(['\uFEFF', csv], {type:'text/csv;charset=utf-8'});
   await saveFileViaDownloads('storico_giocatori.csv', blob);
 }
 
