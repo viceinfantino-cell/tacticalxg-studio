@@ -319,6 +319,7 @@ nav.tabs button.active{background:var(--brand);color:#ffffff;border-color:var(--
 .video-card{padding:12px;margin-bottom:10px;}
 .vc-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
 .vc-head h2{margin:0;flex:1 1 auto;}
+.vc-ver{font-size:11px;color:var(--text-soft);opacity:.7;margin-top:8px;}
 .vc-empty{font-size:13px;color:var(--text-soft);line-height:1.5;}
 .vc-stage{position:relative;background:#000;border-radius:12px;overflow:hidden;}
 .vc-stage video{width:100%;display:block;max-height:58vh;background:#000;}
@@ -379,6 +380,7 @@ body.studio-on #videoCard .vc-stage{flex:none;width:min(100cqw, calc(100cqh * va
 body.studio-on #videoCard .vc-stage video{width:100%;height:100%;max-height:none;object-fit:contain;}
 body.studio-on #videoCard .vc-sync{flex:none;margin-top:6px;gap:5px;}
 body.studio-on #videoCard .vc-status{display:none;}
+body.studio-on #videoCard .vc-ver{display:none;}
 body.studio-on #tab-live.active > .home-pitch-card{grid-area:pitch !important;margin:0 !important;padding:8px;display:flex;flex-direction:column;max-width:none;}
 body.studio-on .home-pitch-card > h2, body.studio-on .home-pitch-card .legend-row, body.studio-on .home-pitch-card .hint{display:none;}
 body.studio-on .home-pitch-card .pitch-wrap{flex:1 1 0;min-height:0;container-type:size;justify-content:center;align-items:center;gap:0;}
@@ -1114,6 +1116,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Modalità studio a schermo intero: video sopra, campetto sotto">⛶</button>
     </div></div>
     <div class="vc-sync" id="vcSync" style="display:none"></div>
+    <div class="vc-ver">Versione app: 12</div>
   </div>
   <div class="card scorebug-card" id="scorebugCard">
     <div class="tbug" id="scorebug">
