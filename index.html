@@ -1026,6 +1026,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
     <div id="projectsListView">
       <div class="landing-section-head">
         <h2>I tuoi progetti</h2>
+        <button class="mini-btn" style="width:auto" onclick="document.getElementById('backupImportInput').click()" title="Importa il backup di un singolo progetto (o un backup completo)">⬆️ Importa</button>
         <button class="mini-btn icon-btn-fill-btn" style="width:auto" onclick="promptNewProject()">+ Nuovo progetto</button>
       </div>
       <div class="projects-grid" id="projectsGrid"></div>
@@ -1035,7 +1036,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
           <span class="backup-head-icon">💾</span>
           <div>
             <div class="backup-head-title">Backup &amp; Ripristino</div>
-            <div class="backup-head-sub">Tieni una copia di tutti i tuoi progetti, indipendente dal dispositivo — utile su iPad se l'app dovesse svuotarsi.</div>
+            <div class="backup-head-sub">Tieni una copia di tutti i tuoi progetti (oppure di un singolo progetto dal tasto 💾 sulla sua scheda), indipendente dal dispositivo — utile su iPad se l'app dovesse svuotarsi.</div>
             <div class="backup-cloudline">
               <span class="cloud-badge" id="cloudBadge"><span class="dot"></span><span id="cloudBadgeText">Cloud: verifica in corso…</span></span>
             </div>
@@ -1043,7 +1044,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
         </div>
         <div class="backup-actions">
           <button class="mini-btn icon-btn-fill-btn" style="width:auto" onclick="exportFullBackup()">⬇️ Esporta backup completo</button>
-          <button class="mini-btn" style="width:auto" onclick="document.getElementById('backupImportInput').click()">⬆️ Importa backup</button>
+          <button class="mini-btn" style="width:auto" onclick="document.getElementById('backupImportInput').click()">⬆️ Importa backup (completo o di un progetto)</button>
           <button class="mini-btn" id="cloudRestoreBtn" style="width:auto" onclick="manualRestoreFromCloud()">☁️ Ripristina dal cloud</button>
           <input type="file" id="backupImportInput" accept="application/json,.json" style="display:none" onchange="handleBackupFileSelected(this)">
         </div>
@@ -1058,6 +1059,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
         <button class="icon-btn" onclick="showLanding()" title="Torna alla Home">🏠</button>
         <h2 id="projectViewTitle" style="flex:1"></h2>
         <button class="icon-btn" onclick="promptRenameProject(openProjectViewId)" title="Rinomina progetto">✏️</button>
+        <button class="mini-btn" style="width:auto" onclick="exportProjectBackup(openProjectViewId)" title="Salva un backup solo di questo progetto">💾 Backup progetto</button>
         <button class="mini-btn icon-btn-fill-btn" style="width:auto" onclick="createMatchInOpenProject()">+ Nuova partita</button>
       </div>
       <div class="projects-grid" id="projectMatchesGrid"></div>
@@ -1134,7 +1136,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Modalità studio a schermo intero: video sopra, campetto sotto">⛶</button>
     </div></div>
     <div class="vc-sync" id="vcSync" style="display:none"></div>
-    <div class="vc-ver">Versione app: 19</div>
+    <div class="vc-ver">Versione app: 20</div>
   </div>
   <div class="card scorebug-card" id="scorebugCard">
     <div class="tbug" id="scorebug">
@@ -2279,6 +2281,86 @@ async function exportFullBackup(){
     setBackupStatus('Esportazione del backup non riuscita.', 'err');
   }
 }
+/* ---- Backup di un singolo progetto (partite + La Mia Squadra), reimportabile senza toccare gli altri ---- */
+function projectBackupFileName(name){
+  const base = String(name || 'progetto').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9_-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40) || 'progetto';
+  return 'TacticalXG_backup_progetto_' + base + '.json';
+}
+async function exportProjectBackup(id){
+  try{
+    const p = projectsIndex.find(function(x){ return x.id === id; });
+    if(!p){ showAlert('Progetto non trovato.'); return; }
+    const ms = getMatchesForProject(id);
+    const matches = {};
+    ms.forEach(function(m){
+      const st = (m.id === currentMatchId) ? state : loadMatchState(m.id);
+      if(st) matches[m.id] = st;
+    });
+    let myTeam = null;
+    try{ const raw = localStorage.getItem(myTeamKey(id)); if(raw) myTeam = JSON.parse(raw); }catch(e){}
+    const data = {app: 'TacticalXG Studio', backupType: 'project', backupVersion: 1, exportedAt: Date.now(),
+      project: p, matchesIndex: ms, myTeam: myTeam, matches: matches};
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    await saveFileViaDownloads(projectBackupFileName(p.name), blob);
+  }catch(e){
+    console.error('Project backup failed', e);
+    showAlert('Backup del progetto non riuscito' + (e && e.message ? ': ' + e.message : '.'));
+  }
+}
+async function importProjectBackupData(obj){
+  if(!obj || !obj.project || !obj.project.id || !Array.isArray(obj.matchesIndex)){
+    setBackupStatus('Il file selezionato non è un backup valido di un progetto.', 'err'); showAlert('Il file selezionato non è un backup valido di un progetto.'); return;
+  }
+  const exists = projectsIndex.find(function(x){ return x.id === obj.project.id; });
+  let asCopy = false;
+  if(exists){
+    const replace = await showConfirm('Il progetto "' + exists.name + '" è già presente su questo dispositivo. Vuoi sostituirlo con la versione del backup (le sue partite attuali vengono sostituite) oppure importarlo come copia separata?',
+      {title: 'Progetto già presente', okLabel: 'Sostituisci', cancelLabel: 'Importa come copia', danger: true});
+    asCopy = !replace;
+  } else {
+    const ok = await showConfirm('Importare il progetto "' + obj.project.name + '" con ' + obj.matchesIndex.length + ' partit' + (obj.matchesIndex.length === 1 ? 'a' : 'e') + '? Gli altri progetti non vengono toccati.', {title: 'Importa progetto', okLabel: 'Importa'});
+    if(!ok) return;
+  }
+  try{
+    const rnd = function(){ return Math.random().toString(36).slice(2, 6); };
+    let pid = obj.project.id;
+    if(asCopy) pid = 'p' + Date.now() + rnd();
+    if(exists && !asCopy){
+      getMatchesForProject(pid).forEach(function(m){ try{ localStorage.removeItem(matchKey(m.id)); }catch(e){} deleteMatchFromCloud(m.id); });
+      matchesIndex = matchesIndex.filter(function(m){ return m.projectId !== pid; });
+      projectsIndex = projectsIndex.filter(function(x){ return x.id !== pid; });
+    }
+    projectsIndex.push({id: pid, name: obj.project.name + (asCopy ? ' (copia)' : ''), createdAt: asCopy ? Date.now() : (obj.project.createdAt || Date.now())});
+    const newIds = [];
+    obj.matchesIndex.forEach(function(m){
+      let nid = m.id;
+      if(asCopy || matchesIndex.some(function(x){ return x.id === nid; })) nid = 'm' + Date.now() + rnd();
+      const st = (obj.matches || {})[m.id];
+      if(st){ try{ localStorage.setItem(matchKey(nid), JSON.stringify(st)); }catch(e){} }
+      matchesIndex.push(Object.assign({}, m, {id: nid, projectId: pid}));
+      newIds.push(nid);
+      if(st) syncMatchToCloud(nid, st);
+    });
+    if(obj.myTeam){ try{ localStorage.setItem(myTeamKey(pid), JSON.stringify(obj.myTeam)); }catch(e){} syncMyTeamToCloud(pid, obj.myTeam); }
+    saveProjectsIndex(); saveMatchesIndex();
+    setCurrentProject(pid);
+    const first = newIds[0];
+    if(first){
+      currentMatchId = first;
+      try{ localStorage.setItem('txg_current_match', currentMatchId); }catch(e){}
+      const loaded = loadMatchState(first);
+      state = freshState();
+      if(loaded) state = Object.assign(state, loaded);
+      LIVE_METRICS.forEach(function(m){ if(!state.counters[m.key]) state.counters[m.key] = {n:0, a:0}; });
+    }
+    migrateProjects(); applyTeamColors(); renderAll(); renderLanding();
+    scheduleCloudSync();
+    showAlert('Progetto "' + obj.project.name + (asCopy ? ' (copia)' : '') + '" importato: ' + newIds.length + ' partit' + (newIds.length === 1 ? 'a' : 'e') + '.');
+  }catch(e){
+    console.error('Project import failed', e);
+    showAlert('Importazione del progetto non riuscita' + (e && e.message ? ': ' + e.message : '.'));
+  }
+}
 function handleBackupFileSelected(inputEl){
   const file = inputEl.files && inputEl.files[0];
   inputEl.value = '';
@@ -2287,7 +2369,7 @@ function handleBackupFileSelected(inputEl){
   reader.onload = function(){
     try{
       const obj = JSON.parse(reader.result);
-      importFullBackupData(obj);
+      if(obj && obj.backupType === 'project') importProjectBackupData(obj); else importFullBackupData(obj);
     }catch(e){
       console.error('Backup parse failed', e);
       setBackupStatus('Il file selezionato non è un backup valido.', 'err');
@@ -6339,6 +6421,7 @@ function renderProjectsGrid(){
     return '<div class="project-card" onclick="openProjectView(&quot;'+p.id+'&quot;)">'+
       '<div class="project-card-bg">'+halfN+'<div class="project-card-seam"></div>'+halfA+'</div>'+
       '<div class="project-card-actions">'+
+        '<button class="project-card-act" onclick="event.stopPropagation(); exportProjectBackup(&quot;'+p.id+'&quot;);" title="Backup di questo progetto">💾</button>'+
         '<button class="project-card-act" onclick="event.stopPropagation(); promptRenameProject(&quot;'+p.id+'&quot;);" title="Rinomina progetto">✏️</button>'+
         '<button class="project-card-act project-card-del" onclick="event.stopPropagation(); deleteProject(&quot;'+p.id+'&quot;);" title="Elimina progetto">🗑</button>'+
       '</div>'+
