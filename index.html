@@ -707,7 +707,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;}
 .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;}
 .tag.n{background:var(--blue);} .tag.a{background:var(--orange);}
 .tag.out-gol{background:var(--green);} .tag.out-parato{background:var(--yellow);color:#1a1a1a;}
-.tag.out-fuori{background:var(--red);} .tag.out-murato{background:var(--black);}
+.tag.out-fuori{background:var(--red);} .tag.out-murato{background:var(--black);} .tag.out-palo{background:#a855f7;}
 .xgnum{
   display:inline-block; background:var(--xg-bg); color:var(--xg); font-weight:700; font-family:var(--font-stat);
   padding:3px 9px; border-radius:8px; font-size:14px; letter-spacing:.02em;
@@ -1136,7 +1136,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Modalità studio a schermo intero: video sopra, campetto sotto">⛶</button>
     </div></div>
     <div class="vc-sync" id="vcSync" style="display:none"></div>
-    <div class="vc-ver">Versione app: 20</div>
+    <div class="vc-ver">Versione app: 21</div>
   </div>
   <div class="card scorebug-card" id="scorebugCard">
     <div class="tbug" id="scorebug">
@@ -1165,6 +1165,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
         <span><i style="background:var(--yellow)"></i>Parato</span>
         <span><i style="background:var(--red)"></i>Fuori</span>
         <span><i style="background:var(--black)"></i>Murato</span>
+        <span><i style="background:#a855f7"></i>Palo</span>
       </div>
       <div class="legend-row" id="zoneSwatchLive"></div>
       <div class="hint">Tocca il punto del tiro: squadra, esito e bonus/malus si scelgono nella scheda che si apre. Tocca una bandierina 🚩 in un angolo per registrare un corner.</div>
@@ -1220,6 +1221,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
         <span><i style="background:var(--yellow)"></i>Parato</span>
         <span><i style="background:var(--red)"></i>Fuori</span>
         <span><i style="background:var(--black)"></i>Murato</span>
+        <span><i style="background:#a855f7"></i>Palo</span>
       </div>
       <div class="legend-row" id="zoneSwatchMappa"></div>
       <div class="hint">Z1 area piccola · Z2 centro area · Z3 area laterale · Z4 fuori area centrale · Z5 fuori area laterale · 🚩 angoli = corner</div>
@@ -1264,6 +1266,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <span><i style="background:var(--yellow)"></i>Parato</span>
       <span><i style="background:var(--red)"></i>Fuori</span>
       <span><i style="background:var(--black)"></i>Murato</span>
+      <span><i style="background:#a855f7"></i>Palo</span>
     </div>
   </div>
 
@@ -1611,6 +1614,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
         <option value="parato">Parato</option>
         <option value="fuori">Fuori</option>
         <option value="murato">Murato</option>
+        <option value="palo">Palo / traversa</option>
       </select>
     </div>
 
@@ -1743,7 +1747,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
         <div class="field"><label>Squadra</label>
           <select id="clipTeam" onchange="clipUpdateInfo()"><option value="all">Entrambe</option><option value="n">Solo nostra</option><option value="a">Solo avversaria</option></select></div>
         <div class="field"><label>Quali tiri</label>
-          <select id="clipOutcome" onchange="clipUpdateInfo()"><option value="all">Tutti i tiri</option><option value="gol">Solo gol</option><option value="gp">Gol e parate</option><option value="occ">Occasioni da gol</option></select></div>
+          <select id="clipOutcome" onchange="clipUpdateInfo()"><option value="all">Tutti i tiri</option><option value="gol">Solo gol</option><option value="gp">Gol e parate</option><option value="palo">Pali e traverse</option><option value="occ">Occasioni da gol</option></select></div>
       </div>
       <div class="clip-row">
         <div class="field"><label>Secondi prima</label><input type="number" id="clipPre" value="8" min="2" max="40" oninput="clipUpdateInfo()"></div>
@@ -1798,8 +1802,8 @@ const MALUS = [
   {key:"testa", label:"Colpo di Testa", val:0.10},
   {key:"angolochiuso", label:"Angolo di tiro chiuso", val:0.10},
 ];
-const OUTCOME_COLOR = {gol:"var(--green)",parato:"var(--yellow)",fuori:"var(--red)",murato:"var(--black)"};
-const OUTCOME_LABEL = {gol:"Gol",parato:"Parato",fuori:"Fuori",murato:"Murato"};
+const OUTCOME_COLOR = {gol:"var(--green)",parato:"var(--yellow)",fuori:"var(--red)",murato:"var(--black)",palo:"#a855f7"};
+const OUTCOME_LABEL = {gol:"Gol",parato:"Parato",fuori:"Fuori",murato:"Murato",palo:"Palo"};
 const ACTION_TYPES = {
   manovrata:"Azione manovrata", contropiede:"Contropiede", cross:"Cross",
   piazzato:"Calcio piazzato", rigore:"Rigore", ribattuta:"Ribattuta", dribbling:"Dribbling",
@@ -2924,11 +2928,11 @@ function zoneLegendHTML(){
   </div>`;
 }
 // Legenda dei pallini della heatmap: il colore del pallino indica la qualità/esito del tiro
-// (Gol/Parato/Fuori/Murato), non la zona di campo — coerente con OUTCOME_COLOR usato per i pallini.
+// (Gol/Parato/Fuori/Murato/Palo), non la zona di campo — coerente con OUTCOME_COLOR usato per i pallini.
 function outcomeLegendHTML(){
   return `<div class="zone-legend">
     <div class="zl-title">Legenda Tiri</div>
-    ${['gol','parato','fuori','murato'].map(o=>`
+    ${['gol','parato','fuori','murato','palo'].map(o=>`
       <div class="zl-row">
         <span class="zl-swatch" style="background:${OUTCOME_COLOR[o]}"></span>
         <span class="zl-desc">${OUTCOME_LABEL[o]}</span>
@@ -3869,6 +3873,7 @@ function clipFiltered(){
     if(team !== 'all' && sh.team !== team) return false;
     if(oc === 'gol') return sh.outcome === 'gol';
     if(oc === 'gp') return sh.outcome === 'gol' || sh.outcome === 'parato';
+    if(oc === 'palo') return sh.outcome === 'palo';
     if(oc === 'occ') return sh.xg >= OCCASIONE_XG_THRESHOLD;
     return true;
   });
@@ -4585,6 +4590,9 @@ function countQuality(team){
 }
 // "Tiri in porta" = tiri che avrebbero fatto gol se non fosse intervenuto il portiere: Gol + Parato
 // (Murato e Fuori non sono considerati in porta, come nella statistica calcistica standard).
+function countPali(team){
+  return state.shots.filter(s=>s.team===team && s.outcome==='palo').length;
+}
 function countOnTarget(team){
   return state.shots.filter(s=>s.team===team && (s.outcome==='gol'||s.outcome==='parato')).length;
 }
@@ -4631,6 +4639,7 @@ function renderSummary(){
     <div class="stat"><div class="lab">xG parati dal portiere (${state.teamN})</div><div class="vals"><b style="color:var(--xg)">${sumXgSaved('n').toFixed(2)}</b></div></div>
     <div class="stat"><div class="lab">xG parati dal portiere (${state.teamA})</div><div class="vals"><b style="color:var(--xg)">${sumXgSaved('a').toFixed(2)}</b></div></div>
     <div class="stat"><div class="lab">N° Parate</div><div class="vals"><b class="n">${countSaves('n')}</b><b class="a">${countSaves('a')}</b></div></div>
+    <div class="stat"><div class="lab">Pali / Traverse</div><div class="vals"><b class="n">${countPali('n')}</b><b class="a">${countPali('a')}</b></div></div>
   `;
 }
 
@@ -5264,6 +5273,7 @@ async function buildFullReportPdfDoc(st){
     {label:'Tiri qualità (Z1+Z2)', n:tiriQualN, a:tiriQualA},
     {label:'xG parati dal portiere', n:xgSavedN.toFixed(2), a:xgSavedA.toFixed(2)},
     {label:'N. parate', n:savesN, a:savesA},
+    {label:'Pali / traverse', n:st.shots.filter(function(x){return x.team==='n'&&x.outcome==='palo';}).length, a:st.shots.filter(function(x){return x.team==='a'&&x.outcome==='palo';}).length},
   ], cN, cA);
 
   y = drawPdfSectionLabel(doc, pageW, y+2, 'Contatori live', brand);
@@ -5853,7 +5863,7 @@ function renderReport(){
   document.getElementById('repHeatLabA').textContent = 'Shot Map — ' + state.teamA;
   // La legenda della heatmap del report descrive l'esito del tiro (colore del pallino),
   // non la zona di campo — coerente con come sono colorati i pallini stessi (OUTCOME_COLOR).
-  document.getElementById('reportZLegend').innerHTML = ['gol','parato','fuori','murato'].map(o=>
+  document.getElementById('reportZLegend').innerHTML = ['gol','parato','fuori','murato','palo'].map(o=>
     `<span><i style="background:${OUTCOME_COLOR[o]}"></i>${OUTCOME_LABEL[o]}</span>`
   ).join('');
   ['n','a'].forEach(team=>{
@@ -5877,6 +5887,7 @@ function renderReport(){
     <div class="report-chip"><span class="k">Gol fuori area</span><span class="v">${golFuoriArea('n')} — ${golFuoriArea('a')}</span></div>
     <div class="report-chip"><span class="k">Gol da calcio piazzato</span><span class="v">${golCalcioPiazzato('n')} — ${golCalcioPiazzato('a')}</span></div>
     <div class="report-chip"><span class="k">xG parati dal portiere</span><span class="v">${sumXgSaved('n').toFixed(2)} — ${sumXgSaved('a').toFixed(2)}</span></div>
+    <div class="report-chip"><span class="k">Pali / Traverse</span><span class="v">${countPali('n')} — ${countPali('a')}</span></div>
   `;
 
   renderReportLineups();
