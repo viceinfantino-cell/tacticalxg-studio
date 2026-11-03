@@ -721,7 +721,8 @@ td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;}
 /* --- v22: posizione in porta, frecce, lettore del tiro --- */
 .shot-dot{cursor:pointer;}
 .shot-arrow{pointer-events:none;}
-.gv-svg{display:block;width:100%;height:auto;max-width:420px;margin:6px auto 0;border-radius:10px;color:var(--text-soft);background:color-mix(in srgb, var(--border) 35%, transparent);}
+.gv-svg{display:block;width:100%;height:auto;max-width:420px;margin:8px auto 0;border-radius:12px;color:var(--text-soft);border:1px solid var(--border);background:linear-gradient(180deg, color-mix(in srgb, var(--bg) 85%, var(--brand)) 0%, var(--bg) 62%, color-mix(in srgb, var(--pitch) 70%, var(--bg)) 100%);}
+.gv-ico{color:var(--brand);flex:none;}
 .gv-svg.pick{cursor:crosshair;touch-action:manipulation;}
 .gp-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--text-soft);margin-top:6px;min-height:22px;}
 .gp-clear{background:none;border:none;color:var(--brand);font-weight:700;font-size:12px;cursor:pointer;padding:2px 4px;}
@@ -735,8 +736,9 @@ td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;}
 .btn-playall{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-weight:800;font-size:13px;cursor:pointer;}
 .btn-playall:disabled{opacity:.4;cursor:default;}
 .goal-view-card{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
-.goal-view-head{font-size:13px;font-weight:800;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
-.goal-view-head span{font-weight:600;color:var(--text-soft);font-size:12px;}
+.goal-view-head{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text-soft);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.goal-view-head .gv-stat{margin-left:auto;}
+.goal-view-head span.gv-stat{font-weight:600;text-transform:none;letter-spacing:0;font-size:12px;}
 .modal.sp-modal{max-width:640px;}
 .sp-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;}
 .sp-title{font-size:16px;font-weight:800;}
@@ -1172,7 +1174,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Modalità studio a schermo intero: video sopra, campetto sotto">⛶</button>
     </div></div>
     <div class="vc-sync" id="vcSync" style="display:none"></div>
-    <div class="vc-ver">Versione app: 22</div>
+    <div class="vc-ver">Versione app: 23</div>
   </div>
   <div class="card scorebug-card" id="scorebugCard">
     <div class="tbug" id="scorebug">
@@ -1342,7 +1344,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <span class="heat-sub" id="playAllInfoN"></span>
     </div>
     <div class="goal-view-card">
-      <div class="goal-view-head">🥅 Dove sono finiti i tiri <span id="goalViewStatN"></span></div>
+      <div class="goal-view-head"><svg class="gv-ico" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3 19V7h18v12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11h18M9 7v12M15 7v12" stroke="currentColor" stroke-width="1" opacity=".55"/></svg><span>Dove sono finiti i tiri</span><span class="gv-stat" id="goalViewStatN"></span></div>
       <svg class="gv-svg" id="goalViewN" viewBox="0 0 300 132"></svg>
       <div class="gp-foot"><span>Vista del tiratore, come nel video. Tocca un pallino per rivederlo.</span></div>
     </div>
@@ -1367,7 +1369,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <span class="heat-sub" id="playAllInfoA"></span>
     </div>
     <div class="goal-view-card">
-      <div class="goal-view-head">🥅 Dove sono finiti i tiri <span id="goalViewStatA"></span></div>
+      <div class="goal-view-head"><svg class="gv-ico" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3 19V7h18v12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11h18M9 7v12M15 7v12" stroke="currentColor" stroke-width="1" opacity=".55"/></svg><span>Dove sono finiti i tiri</span><span class="gv-stat" id="goalViewStatA"></span></div>
       <svg class="gv-svg" id="goalViewA" viewBox="0 0 300 132"></svg>
       <div class="gp-foot"><span>Vista del tiratore, come nel video. Tocca un pallino per rivederlo.</span></div>
     </div>
@@ -1689,7 +1691,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
     </div>
 
     <div class="field" id="modalGoalField">
-      <label>🥅 Dove è finito <span class="gp-opt">(facoltativo)</span></label>
+      <label style="display:flex;align-items:center;gap:7px"><svg class="gv-ico" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3 19V7h18v12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11h18M9 7v12M15 7v12" stroke="currentColor" stroke-width="1" opacity=".55"/></svg>Dove è finito <span class="gp-opt">(facoltativo)</span></label>
       <svg class="gv-svg" id="modalGoalSvg" viewBox="0 0 300 132"></svg>
       <div class="gp-foot"><span id="modalGoalTxt"></span><button type="button" class="gp-clear" id="modalGoalClear" onclick="modalGoalClear()" style="display:none">Rimuovi</button></div>
     </div>
@@ -1755,7 +1757,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <svg class="gv-svg" id="spGoal" viewBox="0 0 300 132"></svg>
       <div class="sp-data">
         <div id="spData"></div>
-        <button type="button" class="player-manual-toggle" onclick="spEditGoal()">🥅 Imposta / modifica la posizione in porta</button>
+        <button type="button" class="player-manual-toggle" onclick="spEditGoal()">Imposta / modifica la posizione in porta</button>
       </div>
     </div>
     <label class="sp-auto"><input type="checkbox" id="spAuto"> Passa al tiro successivo da solo</label>
@@ -1765,7 +1767,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
 <!-- ================= POSIZIONE IN PORTA (tiro già salvato) ================= -->
 <div class="modal-back" id="geBack">
   <div class="modal">
-    <h3>🥅 Posizione in porta</h3>
+    <h3 style="display:flex;align-items:center;gap:8px"><svg class="gv-ico" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3 19V7h18v12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11h18M9 7v12M15 7v12" stroke="currentColor" stroke-width="1" opacity=".55"/></svg>Posizione in porta</h3>
     <div class="heat-sub" id="geInfo" style="margin-top:0"></div>
     <svg class="gv-svg" id="geSvg" viewBox="0 0 300 132"></svg>
     <div class="gp-foot"><span id="geTxt"></span><button type="button" class="gp-clear" id="geClear" onclick="geClear()" style="display:none">Rimuovi</button></div>
@@ -4717,7 +4719,7 @@ function goalBaseSVG(uid){
   const fx = function(k){ return (L + (R - L) * k).toFixed(1); }, fy = function(k){ return (B + (G - B) * k).toFixed(1); };
   const frame = 'M' + L + ',' + G + ' L' + L + ',' + B + ' L' + R + ',' + B + ' L' + R + ',' + G;
   let o = '<defs><pattern id="gvNet_' + uid + '" width="7" height="7" patternUnits="userSpaceOnUse"><path d="M0,0 L7,7 M7,0 L0,7" stroke="currentColor" stroke-width="0.5" opacity="0.45"/></pattern></defs>';
-  o += '<rect x="0" y="' + G + '" width="' + GV.w + '" height="' + (GV.h - G) + '" fill="var(--pitch)" opacity="0.7"/>';
+  for(let i = 0; i < 6; i++){ o += '<rect x="' + (i * 50) + '" y="' + G + '" width="50" height="' + (GV.h - G) + '" fill="' + (i % 2 ? 'var(--pitch-line)' : 'var(--pitch)') + '" opacity="' + (i % 2 ? 0.55 : 0.9) + '"/>'; }
   o += '<rect x="' + L + '" y="' + B + '" width="' + (R - L) + '" height="' + (G - B) + '" fill="url(#gvNet_' + uid + ')"/>';
   [1/3, 2/3].forEach(function(k){
     o += '<line x1="' + fx(k) + '" y1="' + B + '" x2="' + fx(k) + '" y2="' + G + '" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.3"/>';
@@ -4796,7 +4798,7 @@ function initGoalViews(){
 function modalGoalRender(){
   const svg = document.getElementById('modalGoalSvg'); if(!svg) return;
   gvMark(svg, pendingGoal);
-  document.getElementById('modalGoalTxt').textContent = pendingGoal ? ('🥅 ' + goalPosLabel(pendingGoal.gx, pendingGoal.gy)) : 'Tocca la porta dove è arrivato il tiro (puoi saltare)';
+  document.getElementById('modalGoalTxt').textContent = pendingGoal ? ('Porta: ' + goalPosLabel(pendingGoal.gx, pendingGoal.gy)) : 'Tocca la porta dove è arrivato il tiro (puoi saltare)';
   document.getElementById('modalGoalClear').style.display = pendingGoal ? '' : 'none';
 }
 function modalGoalClear(){ pendingGoal = null; modalGoalRender(); }
@@ -4809,7 +4811,7 @@ function syncGoalField(){
 let geId = null, geGoal = null;
 function geRender(){
   gvMark(document.getElementById('geSvg'), geGoal);
-  document.getElementById('geTxt').textContent = geGoal ? ('🥅 ' + goalPosLabel(geGoal.gx, geGoal.gy)) : 'Tocca la porta dove è arrivato il tiro';
+  document.getElementById('geTxt').textContent = geGoal ? ('Porta: ' + goalPosLabel(geGoal.gx, geGoal.gy)) : 'Tocca la porta dove è arrivato il tiro';
   document.getElementById('geClear').style.display = geGoal ? '' : 'none';
 }
 function geOpen(id){
@@ -4937,7 +4939,7 @@ function spShow(){
   document.getElementById('spData').innerHTML =
     '<span class="tag out-' + sh.outcome + '">' + OUTCOME_LABEL[sh.outcome] + '</span> <b>xG ' + sh.xg.toFixed(2) + '</b><br>' +
     'Zona ' + sh.zone + ' · ' + escapeXml(ACTION_TYPES[sh.actionType] || '—') + '<br>' +
-    (hasPos ? '🥅 ' + goalPosLabel(sh.gx, sh.gy) : '<span style="color:var(--text-soft)">Posizione in porta non registrata</span>');
+    (hasPos ? 'Porta: ' + goalPosLabel(sh.gx, sh.gy) : '<span style="color:var(--text-soft)">Posizione in porta non registrata</span>');
   gvDrawShots(document.getElementById('spGoal'), [sh], {r: 8, noEmpty: true});
   document.getElementById('spCount').textContent = spQueue.length > 1 ? ((spIdx + 1) + ' / ' + spQueue.length) : '';
   document.getElementById('spPrev').disabled = spIdx <= 0;
