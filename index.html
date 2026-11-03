@@ -717,6 +717,42 @@ td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;}
 .mini-icon-btn{background:none;border:none;font-size:14px;cursor:pointer;padding:2px 5px;opacity:0.55;}
 .mini-icon-btn.video-has{opacity:1;}
 .mini-icon-btn:hover{opacity:1;}
+
+/* --- v22: posizione in porta, frecce, lettore del tiro --- */
+.shot-dot{cursor:pointer;}
+.shot-arrow{pointer-events:none;}
+.gv-svg{display:block;width:100%;height:auto;max-width:420px;margin:6px auto 0;border-radius:10px;color:var(--text-soft);background:color-mix(in srgb, var(--border) 35%, transparent);}
+.gv-svg.pick{cursor:crosshair;touch-action:manipulation;}
+.gp-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--text-soft);margin-top:6px;min-height:22px;}
+.gp-clear{background:none;border:none;color:var(--brand);font-weight:700;font-size:12px;cursor:pointer;padding:2px 4px;}
+.gp-opt{text-transform:none;font-weight:600;letter-spacing:0;}
+.heat-controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin-top:12px;}
+.heat-seg{max-width:380px;flex:1 1 280px;}
+.heat-seg button.sel{background:var(--brand);border-color:var(--brand);color:#fff;}
+.heat-controls select{padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-weight:600;}
+.heat-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 0;}
+.heat-actions .heat-sub{margin:0;}
+.btn-playall{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-weight:800;font-size:13px;cursor:pointer;}
+.btn-playall:disabled{opacity:.4;cursor:default;}
+.goal-view-card{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+.goal-view-head{font-size:13px;font-weight:800;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.goal-view-head span{font-weight:600;color:var(--text-soft);font-size:12px;}
+.modal.sp-modal{max-width:640px;}
+.sp-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.sp-title{font-size:16px;font-weight:800;}
+.sp-sub{font-size:12.5px;color:var(--text-soft);margin-top:2px;}
+.sp-x{background:var(--border);color:var(--text);border:none;border-radius:50%;width:32px;height:32px;font-size:14px;cursor:pointer;flex:none;}
+.sp-stage{position:relative;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:16/9;max-height:42vh;width:100%;}
+.sp-stage video{width:100%;height:100%;object-fit:contain;background:#000;display:block;}
+.sp-novideo{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#e5e7eb;padding:16px;text-align:center;font-size:13.5px;line-height:1.4;}
+.sp-ctrl{display:flex;gap:8px;align-items:center;margin:10px 0;flex-wrap:wrap;}
+.sp-ctrl button{background:var(--border);color:var(--text);border:none;border-radius:10px;padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer;}
+.sp-ctrl button:disabled{opacity:.35;cursor:default;}
+.sp-count{margin-left:auto;font-size:12.5px;color:var(--text-soft);font-weight:700;}
+.sp-info{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.sp-info .gv-svg{max-width:170px;margin:0;flex:0 0 auto;}
+.sp-data{flex:1 1 140px;font-size:13px;line-height:1.7;}
+.sp-auto{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-soft);font-weight:600;margin-top:8px;}
 .empty{color:var(--text-soft);font-size:13px;text-align:center;padding:18px 0;}
 
 /* --- summary --- */
@@ -1136,7 +1172,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <button type="button" class="vc-fs" onclick="videoFullscreen()" title="Modalità studio a schermo intero: video sopra, campetto sotto">⛶</button>
     </div></div>
     <div class="vc-sync" id="vcSync" style="display:none"></div>
-    <div class="vc-ver">Versione app: 21</div>
+    <div class="vc-ver">Versione app: 22</div>
   </div>
   <div class="card scorebug-card" id="scorebugCard">
     <div class="tbug" id="scorebug">
@@ -1259,7 +1295,7 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
   <div class="card">
     <div class="heat-head">
       <h2 style="margin:0">Da dove sono arrivati i tiri</h2>
-      <p class="heat-sub">Ogni pallino segna il punto esatto del tiro, colorato in base all'esito.</p>
+      <p class="heat-sub">Ogni pallino segna il punto esatto del tiro, colorato in base all'esito. Tocca un pallino per rivedere il tiro nel video.</p>
     </div>
     <div class="heat-outcome-legend">
       <span><i style="background:var(--green)"></i>Gol</span>
@@ -1267,6 +1303,22 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       <span><i style="background:var(--red)"></i>Fuori</span>
       <span><i style="background:var(--black)"></i>Murato</span>
       <span><i style="background:#a855f7"></i>Palo</span>
+    </div>
+    <div class="heat-controls">
+      <div class="seg heat-seg">
+        <button type="button" id="heatModeDots" class="sel" onclick="setHeatMode('dots')">● Pallini</button>
+        <button type="button" id="heatModeArrows" onclick="setHeatMode('arrows')">↗ Frecce verso la porta</button>
+      </div>
+      <select id="heatOutcomeFilter" onchange="setHeatOutcome(this.value)" aria-label="Filtro esito">
+        <option value="all">Tutti gli esiti</option>
+        <option value="gol">Solo gol</option>
+        <option value="gp">In porta (gol + parati)</option>
+        <option value="parato">Solo parati</option>
+        <option value="palo">Pali / traverse</option>
+        <option value="fuori">Fuori</option>
+        <option value="murato">Murati</option>
+        <option value="occ">Occasioni da gol</option>
+      </select>
     </div>
   </div>
 
@@ -1285,6 +1337,15 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
       </div>
       <div id="legendHeatN"></div>
     </div>
+    <div class="heat-actions">
+      <button type="button" class="btn-playall" id="playAllN" onclick="spPlayAll('n')">▶ Riproduci tutti</button>
+      <span class="heat-sub" id="playAllInfoN"></span>
+    </div>
+    <div class="goal-view-card">
+      <div class="goal-view-head">🥅 Dove sono finiti i tiri <span id="goalViewStatN"></span></div>
+      <svg class="gv-svg" id="goalViewN" viewBox="0 0 300 132"></svg>
+      <div class="gp-foot"><span>Vista del tiratore, come nel video. Tocca un pallino per rivederlo.</span></div>
+    </div>
   </div>
 
   <div class="card">
@@ -1300,6 +1361,15 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
         <svg class="pitch" id="heatPitchA" viewBox="0 0 700 480"></svg>
       </div>
       <div id="legendHeatA"></div>
+    </div>
+    <div class="heat-actions">
+      <button type="button" class="btn-playall" id="playAllA" onclick="spPlayAll('a')">▶ Riproduci tutti</button>
+      <span class="heat-sub" id="playAllInfoA"></span>
+    </div>
+    <div class="goal-view-card">
+      <div class="goal-view-head">🥅 Dove sono finiti i tiri <span id="goalViewStatA"></span></div>
+      <svg class="gv-svg" id="goalViewA" viewBox="0 0 300 132"></svg>
+      <div class="gp-foot"><span>Vista del tiratore, come nel video. Tocca un pallino per rivederlo.</span></div>
     </div>
   </div>
   </div>
@@ -1609,13 +1679,19 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
 
     <div class="field">
       <label>Esito</label>
-      <select id="modalOutcome" onchange="updateXgPreview()">
+      <select id="modalOutcome" onchange="updateXgPreview();syncGoalField()">
         <option value="gol">Gol</option>
         <option value="parato">Parato</option>
         <option value="fuori">Fuori</option>
         <option value="murato">Murato</option>
         <option value="palo">Palo / traversa</option>
       </select>
+    </div>
+
+    <div class="field" id="modalGoalField">
+      <label>🥅 Dove è finito <span class="gp-opt">(facoltativo)</span></label>
+      <svg class="gv-svg" id="modalGoalSvg" viewBox="0 0 300 132"></svg>
+      <div class="gp-foot"><span id="modalGoalTxt"></span><button type="button" class="gp-clear" id="modalGoalClear" onclick="modalGoalClear()" style="display:none">Rimuovi</button></div>
     </div>
 
     <div class="field">
@@ -1654,6 +1730,48 @@ footer{text-align:center;color:var(--text-soft);font-size:11px;padding:16px 0 0;
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Annulla</button>
       <button class="btn-save" onclick="saveShot()">Salva tiro</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= LETTORE TIRO (video dal pallino) ================= -->
+<div class="modal-back" id="spBack" onclick="if(event.target===this)spClose()">
+  <div class="modal sp-modal">
+    <div class="sp-head">
+      <div><div class="sp-title" id="spTitle"></div><div class="sp-sub" id="spSub"></div></div>
+      <button type="button" class="sp-x" onclick="spClose()" aria-label="Chiudi">✕</button>
+    </div>
+    <div class="sp-stage">
+      <video id="spVideo" controls playsinline controlslist="nofullscreen" preload="metadata"></video>
+      <div class="sp-novideo" id="spNoVideo"></div>
+    </div>
+    <div class="sp-ctrl">
+      <button type="button" id="spPrev" onclick="spStep(-1)">⏮ Precedente</button>
+      <button type="button" onclick="spReplay()">↺ Rivedi</button>
+      <button type="button" id="spNext" onclick="spStep(1)">Successivo ⏭</button>
+      <span class="sp-count" id="spCount"></span>
+    </div>
+    <div class="sp-info">
+      <svg class="gv-svg" id="spGoal" viewBox="0 0 300 132"></svg>
+      <div class="sp-data">
+        <div id="spData"></div>
+        <button type="button" class="player-manual-toggle" onclick="spEditGoal()">🥅 Imposta / modifica la posizione in porta</button>
+      </div>
+    </div>
+    <label class="sp-auto"><input type="checkbox" id="spAuto"> Passa al tiro successivo da solo</label>
+  </div>
+</div>
+
+<!-- ================= POSIZIONE IN PORTA (tiro già salvato) ================= -->
+<div class="modal-back" id="geBack">
+  <div class="modal">
+    <h3>🥅 Posizione in porta</h3>
+    <div class="heat-sub" id="geInfo" style="margin-top:0"></div>
+    <svg class="gv-svg" id="geSvg" viewBox="0 0 300 132"></svg>
+    <div class="gp-foot"><span id="geTxt"></span><button type="button" class="gp-clear" id="geClear" onclick="geClear()" style="display:none">Rimuovi</button></div>
+    <div class="modal-actions" style="margin-top:14px">
+      <button class="btn-cancel" onclick="geClose()">Annulla</button>
+      <button class="btn-save" onclick="geSave()">Salva</button>
     </div>
   </div>
 </div>
@@ -1864,6 +1982,7 @@ let state = {
 LIVE_METRICS.forEach(m=>state.counters[m.key]={n:0,a:0});
 
 let pendingShot = null; // {x,y,zone}
+let pendingGoal = null; // {gx,gy} posizione in porta (facoltativa)
 let modalTeam = 'n';
 
 /* ---------------- PROGETTI (gruppi di partite) ---------------- */
@@ -3015,25 +3134,56 @@ function perspectivePitchSVG(){
   out += lbl(495,265,'Z5');
   return out;
 }
-function renderShotDotsPerspective(svg, shots){
-  svg.querySelectorAll('.shot-dot').forEach(function(el){ el.remove(); });
+function renderShotDotsPerspective(svg, shots, mode){
+  svg.querySelectorAll('.shot-dot,.shot-arrow').forEach(function(el){ el.remove(); });
+  const NS = 'http://www.w3.org/2000/svg';
+  const flipped = function(s){ return String(s.tempo) === '2' || parseInt(s.tempo,10) === 2; };
+  // Le squadre cambiano campo tra 1° e 2° tempo: per riportare sulla heatmap la vera posizione
+  // del tiro (non solo quella relativa alla porta attaccata in quel momento), nel 2° tempo
+  // specchiamo l'asse orizzontale, come se il campo ruotasse di 180°.
+  if(mode === 'arrows'){
+    const g0 = perspPoint(300, 0);
+    shots.forEach(function(s){
+      if(s.gx == null || s.gy == null) return;
+      const fl = flipped(s);
+      const p = perspPoint(fl ? (600 - s.x) : s.x, s.y);
+      const gxx = fl ? (1 - s.gx) : s.gx;
+      const ex = g0.x + (gxx - 0.5) * 92;
+      const ey = Math.max(418, g0.y + 18 - 16 * Math.min(s.gy, 1.8));
+      const ang = Math.atan2(ey - p.y, ex - p.x), hl = 15, col = OUTCOME_COLOR[s.outcome];
+      const grp = document.createElementNS(NS, 'g');
+      grp.setAttribute('class', 'shot-arrow');
+      const ln = document.createElementNS(NS, 'line');
+      ln.setAttribute('x1', p.x.toFixed(1)); ln.setAttribute('y1', p.y.toFixed(1));
+      ln.setAttribute('x2', (ex - Math.cos(ang) * hl * 0.6).toFixed(1)); ln.setAttribute('y2', (ey - Math.sin(ang) * hl * 0.6).toFixed(1));
+      ln.setAttribute('stroke', col); ln.setAttribute('stroke-width', 3.6); ln.setAttribute('stroke-linecap', 'round'); ln.setAttribute('opacity', 0.85);
+      const hd = document.createElementNS(NS, 'polygon');
+      const a1 = ang - 0.42, a2 = ang + 0.42;
+      hd.setAttribute('points', ex.toFixed(1) + ',' + ey.toFixed(1) + ' ' +
+        (ex - Math.cos(a1) * hl).toFixed(1) + ',' + (ey - Math.sin(a1) * hl).toFixed(1) + ' ' +
+        (ex - Math.cos(a2) * hl).toFixed(1) + ',' + (ey - Math.sin(a2) * hl).toFixed(1));
+      hd.setAttribute('fill', col); hd.setAttribute('opacity', 0.9);
+      grp.appendChild(ln); grp.appendChild(hd); svg.appendChild(grp);
+    });
+  }
   shots.forEach(function(s){
-    // Le squadre cambiano campo tra 1° e 2° tempo: per riportare sulla heatmap la vera posizione
-    // del tiro (non solo quella relativa alla porta attaccata in quel momento), nel 2° tempo
-    // specchiamo l'asse orizzontale, come se il campo ruotasse di 180°.
-    const dx = (String(s.tempo) === '2' || parseInt(s.tempo,10) === 2) ? (600 - s.x) : s.x;
+    const dx = flipped(s) ? (600 - s.x) : s.x;
     const p = perspPoint(dx, s.y);
     const r = (10 - 4.5*p.t).toFixed(1);
-    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('class','shot-dot');
+    const grp = document.createElementNS(NS, 'g');
+    grp.setAttribute('class', 'shot-dot'); grp.setAttribute('data-id', String(s.id));
+    const hit = document.createElementNS(NS, 'circle');
+    hit.setAttribute('cx', p.x.toFixed(1)); hit.setAttribute('cy', p.y.toFixed(1)); hit.setAttribute('r', (parseFloat(r) + 6).toFixed(1));
+    hit.setAttribute('fill', '#000'); hit.setAttribute('fill-opacity', 0);
+    const c = document.createElementNS(NS, 'circle');
     c.setAttribute('cx', p.x.toFixed(1)); c.setAttribute('cy', p.y.toFixed(1)); c.setAttribute('r', r);
     c.setAttribute('fill', OUTCOME_COLOR[s.outcome]);
     c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 1.4);
     c.setAttribute('opacity', 0.94);
-    const t = document.createElementNS('http://www.w3.org/2000/svg','title');
-    t.textContent = s.player+' · '+OUTCOME_LABEL[s.outcome]+' · xG '+s.xg.toFixed(2);
-    c.appendChild(t);
-    svg.appendChild(c);
+    const t = document.createElementNS(NS, 'title');
+    t.textContent = s.player+' · '+OUTCOME_LABEL[s.outcome]+' · xG '+s.xg.toFixed(2)+(s.vt != null ? ' · ▶ tocca per il video' : '');
+    grp.appendChild(hit); grp.appendChild(c); grp.appendChild(t);
+    svg.appendChild(grp);
   });
 }
 
@@ -3047,6 +3197,7 @@ function initPitches(){
 
   document.getElementById('shotPitch').addEventListener('click', onPitchClick);
   document.getElementById('shotPitchLive').addEventListener('click', onPitchClick);
+  initGoalViews();
 }
 
 function onPitchClick(evt){
@@ -3134,6 +3285,7 @@ function openModal(zone){
   const advDetails = document.getElementById('modalAdvDetails');
   if(advDetails) advDetails.open = false;
   setModalTeam('n');
+  pendingGoal = null; modalGoalRender(); syncGoalField();
   updateXgPreview();
   studioModalOpened();
   document.getElementById('modalBack').classList.add('open');
@@ -3249,6 +3401,7 @@ function saveShot(){
     x: pendingShot.x, y: pendingShot.y, xg, cutback: isCutback, verticalizzazione: isVerticalizzazione,
     id: shotId, vt: (modalVideoT != null ? Math.round(modalVideoT * 10) / 10 : undefined)
   });
+  if(pendingGoal && outcome !== 'murato'){ const ns = state.shots[state.shots.length - 1]; ns.gx = pendingGoal.gx; ns.gy = pendingGoal.gy; }
 
   // Aggiornamento automatico dei contatori live in base a zona ed esito
   const t = modalTeam;
@@ -4477,6 +4630,7 @@ function renderShotTable(){
       <td class="num"><span class="xgnum">${s.xg.toFixed(2)}</span></td>
       <td class="shot-actions">
         ${s.vt != null ? `<button class="mini-icon-btn" onclick="videoJumpToShot(${JSON.stringify(s.id)})" title="Rivedi nel video caricato (5s prima)">▶</button>` : ''}
+        <button class="mini-icon-btn${s.gx != null ? ' video-has' : ''}" onclick="geOpen(${JSON.stringify(s.id)})" title="${s.gx != null ? 'Modifica la posizione in porta' : 'Aggiungi la posizione in porta'}">🥅</button>
         ${s.videoUrl ? `<button class="mini-icon-btn video-has" onclick="openShotVideoById(${JSON.stringify(s.id)})" title="Guarda il video">🎥</button>` : ''}
         <button class="mini-icon-btn" onclick="editShotVideoUrl(${JSON.stringify(s.id)})" title="${s.videoUrl?'Modifica link video':'Aggiungi link video'}">${s.videoUrl?'✏️':'🎥'}</button>
         <button class="del" onclick="removeShot(${JSON.stringify(s.id)})">✕</button>
@@ -4532,6 +4686,297 @@ function renderPlayerTable(){
   document.getElementById('playerEmpty').style.display = rows.length? 'none':'block';
 }
 
+/* ================= POSIZIONE IN PORTA, FRECCE E LETTORE DEL TIRO (v22) =================
+   gx/gy = punto in cui il tiro ha raggiunto la porta, visto dal tiratore:
+   gx 0 = palo sinistro, 1 = palo destro (oltre = fuori dai pali); gy 0 = terra, 1 = traversa (oltre = sopra). */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const GV = {w:300, h:132, postL:60, postR:240, ground:112, bar:52, minX:-0.33, maxX:1.33, maxY:1.75};
+function gvPoint(gx, gy){ return {x: GV.postL + gx * (GV.postR - GV.postL), y: GV.ground - gy * (GV.ground - GV.bar)}; }
+function gvFromEvent(evt, svg){
+  const r = svg.getBoundingClientRect();
+  if(!r.width || !r.height) return null;
+  const px = (evt.clientX - r.left) / r.width * GV.w, py = (evt.clientY - r.top) / r.height * GV.h;
+  let gx = (px - GV.postL) / (GV.postR - GV.postL), gy = (GV.ground - py) / (GV.ground - GV.bar);
+  gx = Math.max(GV.minX, Math.min(GV.maxX, gx)); gy = Math.max(0, Math.min(GV.maxY, gy));
+  return {gx: Math.round(gx * 1000) / 1000, gy: Math.round(gy * 1000) / 1000};
+}
+function goalPosLabel(gx, gy){
+  const side = gx < 0 ? 'a sinistra' : gx > 1 ? 'a destra' : '';
+  if(gx < 0 || gx > 1 || gy > 1){
+    if(gy > 1 && side) return 'Fuori: sopra la traversa, ' + side;
+    if(gy > 1) return 'Fuori: sopra la traversa';
+    return 'Fuori: ' + side + ' del palo';
+  }
+  const col = gx < 1/3 ? 'a sinistra' : gx > 2/3 ? 'a destra' : 'al centro';
+  const row = gy < 1/3 ? 'Basso' : gy > 2/3 ? 'Alto' : 'Medio';
+  if(row === 'Medio' && col === 'al centro') return 'Centro porta';
+  return row + ' ' + col;
+}
+function goalBaseSVG(uid){
+  const L = GV.postL, R = GV.postR, G = GV.ground, B = GV.bar;
+  const fx = function(k){ return (L + (R - L) * k).toFixed(1); }, fy = function(k){ return (B + (G - B) * k).toFixed(1); };
+  const frame = 'M' + L + ',' + G + ' L' + L + ',' + B + ' L' + R + ',' + B + ' L' + R + ',' + G;
+  let o = '<defs><pattern id="gvNet_' + uid + '" width="7" height="7" patternUnits="userSpaceOnUse"><path d="M0,0 L7,7 M7,0 L0,7" stroke="currentColor" stroke-width="0.5" opacity="0.45"/></pattern></defs>';
+  o += '<rect x="0" y="' + G + '" width="' + GV.w + '" height="' + (GV.h - G) + '" fill="var(--pitch)" opacity="0.7"/>';
+  o += '<rect x="' + L + '" y="' + B + '" width="' + (R - L) + '" height="' + (G - B) + '" fill="url(#gvNet_' + uid + ')"/>';
+  [1/3, 2/3].forEach(function(k){
+    o += '<line x1="' + fx(k) + '" y1="' + B + '" x2="' + fx(k) + '" y2="' + G + '" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.3"/>';
+    o += '<line x1="' + L + '" y1="' + fy(k) + '" x2="' + R + '" y2="' + fy(k) + '" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.3"/>';
+  });
+  o += '<line x1="0" y1="' + G + '" x2="' + GV.w + '" y2="' + G + '" stroke="var(--pitch-line)" stroke-width="1.6"/>';
+  o += '<path d="' + frame + '" fill="none" stroke="#64748b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>';
+  o += '<path d="' + frame + '" fill="none" stroke="#f8fafc" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>';
+  return o;
+}
+function gvMark(svg, g){
+  svg.querySelectorAll('.gv-pick').forEach(function(e){ e.remove(); });
+  if(!g) return;
+  const p = gvPoint(g.gx, g.gy);
+  const grp = document.createElementNS(SVGNS, 'g'); grp.setAttribute('class', 'gv-pick');
+  const a = document.createElementNS(SVGNS, 'circle');
+  a.setAttribute('cx', p.x.toFixed(1)); a.setAttribute('cy', p.y.toFixed(1)); a.setAttribute('r', 9);
+  a.setAttribute('fill', 'none'); a.setAttribute('stroke', 'var(--brand)'); a.setAttribute('stroke-width', 2.6);
+  const b = document.createElementNS(SVGNS, 'circle');
+  b.setAttribute('cx', p.x.toFixed(1)); b.setAttribute('cy', p.y.toFixed(1)); b.setAttribute('r', 3);
+  b.setAttribute('fill', 'var(--brand)');
+  grp.appendChild(a); grp.appendChild(b); svg.appendChild(grp);
+}
+function shotById(id){ return state.shots.find(function(x){ return String(x.id) === String(id); }); }
+/* pallini degli esiti dentro la porta vista di fronte */
+function gvDrawShots(svg, shots, opts){
+  opts = opts || {};
+  svg.querySelectorAll('.shot-dot,.gv-empty').forEach(function(e){ e.remove(); });
+  let n = 0;
+  shots.forEach(function(s){
+    if(s.gx == null || s.gy == null) return;
+    n++;
+    const p = gvPoint(s.gx, s.gy);
+    const grp = document.createElementNS(SVGNS, 'g');
+    grp.setAttribute('class', 'shot-dot'); grp.setAttribute('data-id', String(s.id));
+    const hit = document.createElementNS(SVGNS, 'circle');
+    hit.setAttribute('cx', p.x.toFixed(1)); hit.setAttribute('cy', p.y.toFixed(1)); hit.setAttribute('r', 13);
+    hit.setAttribute('fill', '#000'); hit.setAttribute('fill-opacity', 0);
+    const c = document.createElementNS(SVGNS, 'circle');
+    c.setAttribute('cx', p.x.toFixed(1)); c.setAttribute('cy', p.y.toFixed(1)); c.setAttribute('r', opts.r || 7);
+    c.setAttribute('fill', OUTCOME_COLOR[s.outcome]); c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 1.5);
+    c.setAttribute('opacity', 0.95);
+    const t = document.createElementNS(SVGNS, 'title');
+    t.textContent = (s.player || '') + ' · ' + OUTCOME_LABEL[s.outcome] + ' · ' + goalPosLabel(s.gx, s.gy) + (s.vt != null ? ' · ▶ video' : '');
+    grp.appendChild(hit); grp.appendChild(c); grp.appendChild(t); svg.appendChild(grp);
+  });
+  if(!n && !opts.noEmpty){
+    const t = document.createElementNS(SVGNS, 'text');
+    t.setAttribute('class', 'gv-empty'); t.setAttribute('x', 150); t.setAttribute('y', 86); t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', 11); t.setAttribute('fill', 'currentColor'); t.setAttribute('opacity', 0.8);
+    t.textContent = 'Nessuna posizione registrata';
+    svg.appendChild(t);
+  }
+}
+function gvBindPicker(svg, fn){
+  svg.classList.add('pick');
+  svg.addEventListener('click', function(e){ const g = gvFromEvent(e, svg); if(g) fn(g); });
+}
+function initGoalViews(){
+  [['goalViewN', 'n'], ['goalViewA', 'a'], ['modalGoalSvg', 'm'], ['geSvg', 'e'], ['spGoal', 's']].forEach(function(p){
+    const svg = document.getElementById(p[0]);
+    if(svg) svg.innerHTML = goalBaseSVG(p[1]);
+  });
+  gvBindPicker(document.getElementById('modalGoalSvg'), function(g){ pendingGoal = g; modalGoalRender(); });
+  gvBindPicker(document.getElementById('geSvg'), function(g){ geGoal = g; geRender(); });
+  [['heatPitchN', 'n'], ['goalViewN', 'n'], ['heatPitchA', 'a'], ['goalViewA', 'a']].forEach(function(p){
+    document.getElementById(p[0]).addEventListener('click', function(e){
+      const d = e.target.closest ? e.target.closest('.shot-dot') : null;
+      if(d) spOpenShot(d.getAttribute('data-id'), p[1]);
+    });
+  });
+  modalGoalRender();
+}
+
+/* --- campo "Dove è finito" nella scheda di registrazione tiro --- */
+function modalGoalRender(){
+  const svg = document.getElementById('modalGoalSvg'); if(!svg) return;
+  gvMark(svg, pendingGoal);
+  document.getElementById('modalGoalTxt').textContent = pendingGoal ? ('🥅 ' + goalPosLabel(pendingGoal.gx, pendingGoal.gy)) : 'Tocca la porta dove è arrivato il tiro (puoi saltare)';
+  document.getElementById('modalGoalClear').style.display = pendingGoal ? '' : 'none';
+}
+function modalGoalClear(){ pendingGoal = null; modalGoalRender(); }
+function syncGoalField(){
+  const f = document.getElementById('modalGoalField'); if(!f) return;
+  f.style.display = document.getElementById('modalOutcome').value === 'murato' ? 'none' : '';
+}
+
+/* --- modifica della posizione su un tiro già salvato --- */
+let geId = null, geGoal = null;
+function geRender(){
+  gvMark(document.getElementById('geSvg'), geGoal);
+  document.getElementById('geTxt').textContent = geGoal ? ('🥅 ' + goalPosLabel(geGoal.gx, geGoal.gy)) : 'Tocca la porta dove è arrivato il tiro';
+  document.getElementById('geClear').style.display = geGoal ? '' : 'none';
+}
+function geOpen(id){
+  const sh = shotById(id); if(!sh) return;
+  geId = sh.id;
+  geGoal = (sh.gx != null && sh.gy != null) ? {gx: sh.gx, gy: sh.gy} : null;
+  document.getElementById('geInfo').textContent = (sh.player || '—') + (sh.min ? ' · ' + sh.min + "'" : '') + ' · ' + OUTCOME_LABEL[sh.outcome];
+  geRender();
+  document.getElementById('geBack').classList.add('open');
+}
+function geClose(){ document.getElementById('geBack').classList.remove('open'); geId = null; }
+function geClear(){ geGoal = null; geRender(); }
+function geSave(){
+  const sh = shotById(geId);
+  if(sh){
+    if(geGoal){ sh.gx = geGoal.gx; sh.gy = geGoal.gy; } else { delete sh.gx; delete sh.gy; }
+    saveState();
+  }
+  geClose();
+  renderAll();
+  if(document.getElementById('spBack').classList.contains('open')) spShow();
+}
+
+/* --- filtri e vista della Shot Map --- */
+let heatMode = 'dots', heatOutcomeFilter = 'all';
+function heatOutcomeMatch(s, f){
+  if(!f || f === 'all') return true;
+  if(f === 'gp') return s.outcome === 'gol' || s.outcome === 'parato';
+  if(f === 'occ') return s.xg >= OCCASIONE_XG_THRESHOLD;
+  return s.outcome === f;
+}
+function heatShotsFor(team){
+  const sel = document.getElementById(team === 'n' ? 'heatPlayerFilterN' : 'heatPlayerFilterA');
+  const chosen = sel ? sel.value : '';
+  return state.shots.filter(function(s){ return s.team === team && (!chosen || s.player === chosen) && heatOutcomeMatch(s, heatOutcomeFilter); });
+}
+function setHeatMode(m){
+  heatMode = m;
+  document.getElementById('heatModeDots').classList.toggle('sel', m === 'dots');
+  document.getElementById('heatModeArrows').classList.toggle('sel', m === 'arrows');
+  renderHeatmaps();
+}
+function setHeatOutcome(v){ heatOutcomeFilter = v; renderHeatmaps(); }
+function heatExtras(team, shots){
+  const T = team === 'n' ? 'N' : 'A';
+  const withVt = shots.filter(function(s){ return s.vt != null; }).length;
+  const withPos = shots.filter(function(s){ return s.gx != null && s.gy != null; }).length;
+  const btn = document.getElementById('playAll' + T);
+  btn.textContent = '▶ Riproduci tutti (' + withVt + ')';
+  btn.disabled = withVt === 0;
+  let info = shots.length ? (withVt + ' di ' + shots.length + ' tiri hanno il video') : 'Nessun tiro con questo filtro';
+  if(heatMode === 'arrows' && shots.length && !withPos) info += ' · nessuna posizione in porta registrata per le frecce';
+  document.getElementById('playAllInfo' + T).textContent = info;
+  document.getElementById('goalViewStat' + T).textContent = withPos ? ('· ' + withPos + ' di ' + shots.length + ' con posizione') : '';
+  gvDrawShots(document.getElementById('goalView' + T), shots);
+}
+
+/* --- lettore del tiro: video dal pallino, precedente / successivo, riproduci tutti --- */
+let spQueue = [], spIdx = 0, spEndT = Infinity, spTimer = null, spTok = 0;
+function spVideoEl(){ return document.getElementById('spVideo'); }
+function spOpen(queue, idx, auto){
+  spQueue = queue; spIdx = idx;
+  document.getElementById('spAuto').checked = !!auto;
+  if(typeof hideUndoToast === 'function') hideUndoToast();
+  const mv = videoEl(); if(mv && !mv.paused) mv.pause();
+  document.getElementById('spBack').classList.add('open');
+  spShow();
+}
+function spQueueFor(team){
+  return heatShotsFor(team).filter(function(s){ return s.vt != null; }).sort(function(a, b){ return a.vt - b.vt; });
+}
+function spOpenShot(id, team){
+  const sh = shotById(id); if(!sh) return;
+  let q = spQueueFor(team || sh.team);
+  let i = q.findIndex(function(x){ return String(x.id) === String(sh.id); });
+  if(i < 0){ q = [sh]; i = 0; }
+  spOpen(q, i, false);
+}
+function spPlayAll(team){
+  const q = spQueueFor(team);
+  if(!q.length){ showAlert('Nessun tiro con il video: i tiri registrati con il video della partita caricato salvano il momento da rivedere.'); return; }
+  spOpen(q, 0, true);
+}
+function spPre(){ return Math.max(2, Math.min(40, parseFloat((document.getElementById('clipPre') || {}).value) || 8)); }
+function spPost(){ return Math.max(2, Math.min(40, parseFloat((document.getElementById('clipPost') || {}).value) || 6)); }
+function spMessage(html){
+  const m = document.getElementById('spNoVideo');
+  m.innerHTML = html; m.style.display = 'flex';
+  spVideoEl().style.visibility = 'hidden';
+}
+function spLoadVideo(){
+  const sh = spQueue[spIdx];
+  const v = spVideoEl(), m = document.getElementById('spNoVideo');
+  clearTimeout(spTimer); spEndT = Infinity; spTok++;
+  const tok = spTok;
+  try{ v.pause(); }catch(e){}
+  m.style.display = 'none'; v.style.visibility = '';
+  if(!sh) return;
+  if(sh.vt == null){
+    spMessage('Questo tiro è stato registrato senza il video sincronizzato: non c\'è un momento da rivedere.');
+    return;
+  }
+  const src = videoEl().getAttribute('src');
+  if(!src){
+    spMessage('Per rivedere il tiro carica il video della partita nella scheda Home (lo stesso file usato in registrazione).<button type="button" class="btn-playall" onclick="spClose();var b=document.querySelector(\'.tab-btn[data-tab=live]\');if(b)b.click();">Vai alla Home</button>');
+    return;
+  }
+  if(v.getAttribute('src') !== src){ v.src = src; v.load(); }
+  const start = Math.max(0, sh.vt - spPre());
+  const go = function(){
+    if(tok !== spTok) return;
+    spEndT = sh.vt + spPost();
+    v.currentTime = start;
+    const p = v.play(); if(p && p.catch) p.catch(function(){});
+  };
+  if(v.readyState >= 1) go(); else v.addEventListener('loadedmetadata', go, {once: true});
+}
+function spShow(){
+  const sh = spQueue[spIdx]; if(!sh) return;
+  const tn = sh.team === 'n' ? state.teamN : state.teamA;
+  const name = (sh.player && sh.player !== '—') ? sh.player : 'Giocatore non indicato';
+  document.getElementById('spTitle').textContent = name + (sh.min ? ' · ' + sh.min + "'" : '');
+  document.getElementById('spSub').textContent = tn + ' · ' + sh.tempo + '° tempo';
+  const hasPos = sh.gx != null && sh.gy != null;
+  document.getElementById('spData').innerHTML =
+    '<span class="tag out-' + sh.outcome + '">' + OUTCOME_LABEL[sh.outcome] + '</span> <b>xG ' + sh.xg.toFixed(2) + '</b><br>' +
+    'Zona ' + sh.zone + ' · ' + escapeXml(ACTION_TYPES[sh.actionType] || '—') + '<br>' +
+    (hasPos ? '🥅 ' + goalPosLabel(sh.gx, sh.gy) : '<span style="color:var(--text-soft)">Posizione in porta non registrata</span>');
+  gvDrawShots(document.getElementById('spGoal'), [sh], {r: 8, noEmpty: true});
+  document.getElementById('spCount').textContent = spQueue.length > 1 ? ((spIdx + 1) + ' / ' + spQueue.length) : '';
+  document.getElementById('spPrev').disabled = spIdx <= 0;
+  document.getElementById('spNext').disabled = spIdx >= spQueue.length - 1;
+  spLoadVideo();
+}
+function spStep(d){
+  const n = spIdx + d;
+  if(n < 0 || n >= spQueue.length) return;
+  spIdx = n; spShow();
+}
+function spReplay(){ spLoadVideo(); }
+function spEditGoal(){ const sh = spQueue[spIdx]; if(sh) geOpen(sh.id); }
+function spClose(){
+  clearTimeout(spTimer); spTok++; spEndT = Infinity;
+  const v = spVideoEl(); try{ v.pause(); }catch(e){}
+  document.getElementById('spBack').classList.remove('open');
+}
+function spWindowEnd(){
+  spEndT = Infinity;
+  const v = spVideoEl(); try{ v.pause(); }catch(e){}
+  if(document.getElementById('spAuto').checked && spIdx < spQueue.length - 1){
+    clearTimeout(spTimer);
+    spTimer = setTimeout(function(){ if(document.getElementById('spBack').classList.contains('open')) spStep(1); }, 700);
+  }
+}
+(function(){
+  const v = document.getElementById('spVideo');
+  v.addEventListener('timeupdate', function(){ if(v.currentTime >= spEndT) spWindowEnd(); });
+  v.addEventListener('ended', function(){ spWindowEnd(); });
+  document.addEventListener('keydown', function(e){
+    if(!document.getElementById('spBack').classList.contains('open') || document.getElementById('geBack').classList.contains('open')) return;
+    if(e.key === 'Escape'){ spClose(); }
+    else if(e.target && e.target.tagName === 'VIDEO') return;
+    else if(e.key === 'ArrowLeft'){ spStep(-1); }
+    else if(e.key === 'ArrowRight'){ spStep(1); }
+  });
+})();
+
 /* ---------------- HEATMAPS (con filtro per singolo giocatore) ----------------
    Ogni pitch ha una select con i giocatori che hanno almeno un tiro registrato
    per quella squadra, così l'analista può isolare zona/esito/xG di un singolo
@@ -4566,8 +5011,9 @@ function renderHeatmaps(){
     sel.value = players.includes(prevVal) ? prevVal : '';
 
     const chosen = sel.value;
-    const shots = chosen ? teamShots.filter(s=>s.player===chosen) : teamShots;
-    renderShotDotsPerspective(svg, shots);
+    const shots = heatShotsFor(team);
+    renderShotDotsPerspective(svg, shots, heatMode);
+    heatExtras(team, shots);
 
     if(chosen && byPlayer[chosen]){
       const st = byPlayer[chosen];
